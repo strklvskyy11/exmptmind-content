@@ -1,0 +1,764 @@
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Golos+Text:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --pd-ink:#000;
+    --pd-grey:#8C8C8C;
+    --pd-line:#D9D9D9;
+    --pd-media:#F2F2F2;
+    --pd-blue:#1C00FF;
+    --pd-font:'Golos Text','Helvetica Neue',Arial,sans-serif;
+  }
+  body{background:#fff}
+  .pd,.pd *{box-sizing:border-box;margin:0;padding:0}
+  .pd{font-family:var(--pd-font);color:var(--pd-ink);background:#fff;font-size:14px;line-height:1.2;letter-spacing:-.005em;
+    -webkit-font-smoothing:antialiased;-moz-osx-font-smoothing:grayscale}
+  .pd a{color:inherit;text-decoration:none}
+  .pd button{font:inherit;color:inherit;background:none;border:0;cursor:pointer;letter-spacing:inherit}
+  .pd button:focus{outline:none}
+  .pd a:focus,.pd button:focus-visible{outline:none}
+  .pd img{display:block;width:100%;height:100%;object-fit:cover}
+  .pd-logo{display:block;height:17px}
+  .pd-logo img{height:100%;width:auto;object-fit:contain}
+  .pd-header{position:fixed;top:16px;left:16px;right:16px;z-index:9990;transition:opacity .45s ease,transform .45s ease}
+  .pd-header.is-away{opacity:0;transform:translateY(-12px);pointer-events:none}
+  .pd-announce{position:relative;height:30px;overflow:hidden;border-radius:8px 8px 0 0;
+    background:rgba(242,242,242,.75);-webkit-backdrop-filter:blur(2px);backdrop-filter:blur(2px);
+    font-size:11px;font-weight:500;letter-spacing:.01em}
+  .pd-announce span{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;opacity:0;transition:opacity .4s}
+  .pd-announce span.is-on{opacity:1}
+  .pd-pill{position:relative;height:38px;display:grid;grid-template-columns:1fr auto 1fr;align-items:center;padding:0 12px;
+    border-radius:0 0 8px 8px;background:#fff}
+  .pd-nav{display:flex;align-items:center;gap:28px;font-size:13px;font-weight:500}
+  .pd-nav--r{justify-content:flex-end}
+  .pd-nav a:hover{color:var(--pd-blue)}
+  .pd-mob{display:none}
+  .pd-menu{display:none}
+  .pd-main{display:grid;grid-template-columns:1fr 1fr;padding-top:96px}
+  .pd-gallerywrap{position:relative;min-width:0}
+  .pd-gallery{display:flex;flex-direction:column;gap:5px}
+  .pd-gallery figure{aspect-ratio:3/4;background:var(--pd-media);overflow:hidden}
+  .pd-gallery figure.is-pack img{mix-blend-mode:multiply}
+  .pd-gcount{display:none}
+  .pd-info{position:sticky;top:96px;align-self:start;padding:60px 0 80px 17%;width:80%;
+    max-height:calc(100vh - 96px);overflow-y:auto;scrollbar-width:none}
+  .pd-info::-webkit-scrollbar{display:none}
+  .pd-info__in{max-width:630px}
+  .pd-title{display:flex;justify-content:space-between;align-items:baseline;gap:20px;font-size:17px;font-weight:600;letter-spacing:-.02em;line-height:1.2}
+  .pd-title h1{font:inherit;letter-spacing:inherit}
+  .pd-swatches{display:flex;gap:6px;margin-top:40px}
+  .pd-swatch{width:48px;height:48px;display:block;border-bottom:2px solid transparent;
+    background:#ccc center/cover;box-shadow:inset 0 0 0 1px rgba(0,0,0,.08)}
+  .pd-swatch.is-active{border-bottom-color:#000}
+  .pd-swatch:hover{border-bottom-color:var(--pd-blue)}
+  .pd-colorname{font-size:12px;margin-top:10px}
+  .pd-sizes{display:grid;grid-template-columns:repeat(6,1fr);margin-top:30px}
+  .pd .pd-size{height:40px;display:flex;align-items:center;justify-content:center;grid-column:span 2;
+    border:1px solid var(--pd-line);background:#fff;font-size:14px}
+  .pd .pd-size.is-active{border-color:#000}
+  .pd .pd-size:hover{border-color:var(--pd-blue);color:var(--pd-blue)}
+  .pd .pd-size.is-active,.pd .pd-size.is-active:hover{border-color:#000;box-shadow:inset 0 0 0 1px #000;color:#000}
+  .pd-buy{display:grid;grid-template-columns:1fr 1fr;margin-top:10px}
+  .pd-btn{height:40px;display:flex;align-items:center;justify-content:center;background:#000;color:#fff!important;font-size:12px;font-weight:500}
+  .pd-btn + .pd-btn{border-left:1px solid #333}
+  .pd-btn:hover{background:var(--pd-blue)}
+  .pd-mbar{display:none}
+  .pd-select{display:none;height:40px;margin-top:10px;align-items:center;justify-content:center;
+    border:1px solid var(--pd-line);font-size:12px;color:var(--pd-grey)}
+  .pd-info.needs-size .pd-select{display:flex}
+  .pd-info.needs-size .pd-buy{display:none}
+  .pd-mbar__pick{display:none}
+  .pd-info.needs-size .pd-mbar__pick{display:inline}
+  .pd-info.needs-size .pd-mbar__cta{display:none}
+  .pd .pd-lb__size.is-short{width:64px}
+  .pd-desc{margin-top:40px;font-size:14px;line-height:1.3}
+  .pd-acc{margin-top:60px;border-bottom:1px solid var(--pd-line)}
+  .pd .pd-acc__btn{display:flex;width:100%;justify-content:space-between;align-items:center;height:48px;
+    border-top:1px solid var(--pd-line);font-size:13px;font-weight:500;text-align:left}
+  .pd .pd-acc__btn::after{content:"+";font-size:18px;font-weight:400;line-height:1}
+  .pd .pd-acc__btn.is-open::after{content:"\2212"}
+  .pd .pd-acc__btn:hover{color:var(--pd-blue)}
+  .pd-panel{display:none;padding:2px 0 18px;font-size:13px;line-height:1.5}
+  .pd-panel.is-open{display:block}
+  .pd-panel ul{list-style:none}
+  .pd .pd-chart{position:relative;display:block;width:100%;max-width:280px;cursor:zoom-in;background:#fff}
+  .pd-chart img{height:auto;object-fit:contain}
+  .pd-chart__loupe{position:absolute;right:6px;bottom:6px;width:34px;height:34px;border-radius:50%;
+    display:flex;align-items:center;justify-content:center;background:#fff;border:1px solid var(--pd-line)}
+  .pd-chart__loupe svg{width:16px;height:16px;fill:none;stroke:currentColor;stroke-width:1.6}
+  .pd-chart:hover .pd-chart__loupe{color:var(--pd-blue);border-color:var(--pd-blue)}
+  .pd-chart__note{margin-top:10px;font-size:11px;line-height:1.4;color:var(--pd-grey);max-width:280px}
+  .pd-zoom{display:none;position:fixed;inset:0;z-index:10000;align-items:center;justify-content:center;padding:16px}
+  .pd-zoom.is-open{display:flex}
+  .pd-zoom__bg{position:absolute;inset:0;background:rgba(0,0,0,.6);cursor:pointer}
+  .pd-zoom__box{position:relative;background:#fff;max-width:100%;padding:44px 24px 24px}
+  .pd-zoom__box img{width:auto;max-width:100%;height:auto;max-height:60vh;object-fit:contain;margin:0 auto}
+  .pd .pd-zoom__close{position:absolute;top:10px;right:10px;width:32px;height:32px;display:flex;align-items:center;justify-content:center}
+  .pd-zoom__close svg{width:18px;height:18px;fill:none;stroke:currentColor;stroke-width:1.4}
+  .pd .pd-zoom__close:hover{color:var(--pd-blue)}
+  .pd-gallery figure{cursor:zoom-in}
+  .pd-lb{display:none;position:fixed;inset:0;z-index:10001;background:var(--pd-media)}
+  .pd-lb.is-open{display:block}
+  .pd-lb__stage{position:absolute;inset:0;overflow-y:auto;overscroll-behavior:contain;padding-bottom:64px}
+  .pd-lb__stage figure{background:var(--pd-media)}
+  .pd-lb__stage img{height:auto}
+  .pd-lb figure.is-pack img,.pd-lb button.is-pack img{mix-blend-mode:multiply}
+  .pd-lb__thumbs{position:absolute;left:16px;top:16px;z-index:3;display:flex;flex-direction:column;gap:2px}
+  .pd .pd-lb__thumbs button{display:block;width:56px;height:74px;background:#fff;border:1px solid transparent;overflow:hidden}
+  .pd .pd-lb__thumbs button.is-active{border-color:#000}
+  .pd .pd-lb__thumbs button:hover{border-color:var(--pd-blue)}
+  .pd .pd-lb__close{position:absolute;top:16px;right:16px;z-index:3;width:44px;height:44px;border-radius:50%;background:#fff;
+    display:flex;align-items:center;justify-content:center}
+  .pd-lb__close svg{width:18px;height:18px;fill:none;stroke:currentColor;stroke-width:1.5}
+  .pd .pd-lb__close:hover{color:var(--pd-blue)}
+  .pd-lb__bar{position:absolute;left:0;right:0;bottom:0;z-index:3;display:flex;justify-content:space-between;align-items:flex-end;
+    padding:0 0 0 16px;pointer-events:none}
+  .pd-lb__bar > *{pointer-events:auto}
+  .pd-lb__name{font-size:17px;font-weight:600;letter-spacing:-.02em;padding-bottom:14px}
+  .pd-lb__name span{margin-left:28px;font-weight:500}
+  .pd-lb__buy{display:flex;align-items:stretch;gap:10px;height:48px}
+  .pd .pd-lb__size{width:120px;background:#fff;border:1px solid var(--pd-line);font-size:14px}
+  .pd .pd-lb__size:hover{border-color:var(--pd-blue);color:var(--pd-blue)}
+  .pd .pd-lb__size.is-active,.pd .pd-lb__size.is-active:hover{border-color:#000;box-shadow:inset 0 0 0 1px #000;color:#000}
+  .pd-lb__select{display:flex;align-items:center;justify-content:center;width:320px;background:#fff;border:1px solid var(--pd-line);font-size:14px}
+  .pd-lb__btn{display:none;align-items:center;justify-content:center;width:160px;background:#000;color:#fff!important;font-size:14px;font-weight:500}
+  .pd-lb__btn + .pd-lb__btn{margin-left:-10px;border-left:1px solid #333}
+  .pd-lb__btn:hover{background:var(--pd-blue)}
+  .pd-lb.is-sized .pd-lb__select{display:none}
+  .pd-lb.is-sized .pd-lb__btn{display:flex}
+  .pd-rec{padding:120px 5px 60px}
+  .pd-rec h2{text-align:center;font-size:17px;font-weight:600;letter-spacing:-.02em;margin-bottom:40px}
+  .pd-rec__grid{display:grid;grid-template-columns:repeat(4,1fr);gap:5px}
+  .pd-card__media{position:relative;aspect-ratio:3/4;background:var(--pd-media);overflow:hidden}
+  .pd-card__media img{position:absolute;inset:0}
+  .pd-card__media img.alt{opacity:0}
+  .pd-card:hover .pd-card__media img.alt{opacity:1}
+  .pd-card:hover .pd-card__media img:not(.alt){opacity:0}
+  .pd-card.is-pack .pd-card__media img{mix-blend-mode:multiply}
+  .pd-card__tag{position:absolute;left:8px;top:8px;z-index:2;font-size:12px;color:var(--pd-grey)}
+  .pd-card__info{display:flex;justify-content:space-between;gap:12px;padding:10px 8px 0;font-size:13px}
+  .pd-card__info p:first-child{font-weight:600}
+  .pd-card__info span{display:block;font-weight:400;color:var(--pd-grey);margin-top:2px}
+  .pd-card__info p:last-child{white-space:nowrap}
+  .pd-card:hover .pd-card__info p:first-child{color:var(--pd-blue)}
+  .pd-foot{display:grid;grid-template-columns:1fr auto 1fr;align-items:center;height:40px;margin:40px 16px 16px;padding:0 16px;
+    border-radius:999px;background:#E8E9EB;font-size:12px;font-weight:500}
+  .pd-foot__logo{display:block;height:13px}
+  .pd-foot__logo img{height:100%;width:auto;object-fit:contain}
+  .pd-foot__r{display:flex;justify-content:flex-end;align-items:center;gap:22px}
+  .pd-foot__lang{display:flex;gap:3px;color:var(--pd-grey)}
+  .pd-foot__lang a{color:var(--pd-ink)}
+  .pd-foot a:hover{color:var(--pd-blue)}
+  @media (min-width:821px) and (hover:hover){
+    .pd-announce{transition:opacity .35s ease}
+    .pd-pill{transition:background-color .35s ease}
+    .pd-header.is-clear .pd-announce{opacity:0}
+    .pd-header.is-clear .pd-pill{background-color:transparent}
+    .pd-header.is-clear:hover .pd-announce,.pd-header.is-clear:focus-within .pd-announce{opacity:1}
+    .pd-header.is-clear:hover .pd-pill,.pd-header.is-clear:focus-within .pd-pill{background-color:#fff}
+  }
+  @media (max-width:820px){
+    .pd-lb__thumbs{display:none}
+    .pd-lb__stage{padding-bottom:150px}
+    .pd .pd-lb__close{top:10px;right:10px}
+    .pd-lb__bar{flex-direction:column;align-items:stretch;padding:12px 10px 10px;background:var(--pd-media);gap:10px}
+    .pd-lb__name{padding:0;font-size:15px;display:flex;justify-content:space-between}
+    .pd-lb__buy{gap:6px}
+    .pd .pd-lb__size{width:96px;flex:none}
+    .pd .pd-lb__size.is-short{width:52px}
+    .pd-lb__select{width:auto;flex:1}
+    .pd-lb__btn{width:auto;flex:1;font-size:13px}
+    .pd-lb__btn + .pd-lb__btn{margin-left:-6px}
+    .pd-header{top:8px;left:10px;right:10px}
+    .pd-announce{height:26px;font-size:10px}
+    .pd-pill{height:40px;display:flex;justify-content:space-between;padding:0 12px}
+    .pd-nav{display:none}
+    .pd-logo{height:15px}
+    .pd-logo img{margin-left:-23px}
+    .pd-mob{display:flex;align-items:center;gap:16px}
+    .pd-mob a,.pd .pd-mob button{display:flex;width:22px;height:22px;align-items:center;justify-content:center}
+    .pd-mob svg{width:20px;height:20px;fill:none;stroke:currentColor;stroke-width:1.5}
+    .pd-mob a:hover,.pd .pd-mob button:hover{color:var(--pd-blue)}
+    .pd-burger .i-close{display:none}
+    .pd-header.is-menu .pd-burger .i-open{display:none}
+    .pd-header.is-menu .pd-burger .i-close{display:block}
+    .pd-header.is-menu .pd-pill{border-radius:0}
+    .pd-header.is-menu .pd-menu{display:block}
+    .pd-menu{background:#fff;border-top:1px solid var(--pd-line);border-radius:0 0 8px 8px;padding:28px 16px 24px;text-align:center}
+    .pd-menu a{display:block;font-size:22px;font-weight:600;letter-spacing:-.02em;padding:8px 0}
+    .pd-menu a:hover{color:var(--pd-blue)}
+    .pd-menu__lang{display:flex;justify-content:center;gap:18px;margin-top:22px}
+    .pd-menu__lang a{font-size:15px}
+    .pd-main{grid-template-columns:1fr;padding-top:84px}
+    .pd-gallery{flex-direction:row;overflow-x:auto;scroll-snap-type:x mandatory;gap:3px;scrollbar-width:none;
+      -webkit-overflow-scrolling:touch;overscroll-behavior-x:contain;cursor:grab}
+    .pd-gallery::-webkit-scrollbar{display:none}
+    .pd-gallery.is-drag{cursor:grabbing;scroll-snap-type:none}
+    .pd-gallery figure{flex:0 0 88%;scroll-snap-align:start}
+    .pd-gallery img{-webkit-user-drag:none;user-select:none;pointer-events:none}
+    .pd-gcount{display:block;position:absolute;right:12px;bottom:12px;z-index:2;font-size:11px;padding:4px 8px;border-radius:999px;background:rgba(255,255,255,.85)}
+    .pd-gcount i{font-style:normal}
+    .pd-info{position:static;width:100%;padding:28px 16px 40px;max-height:none;overflow:visible}
+    .pd-acc{margin-top:40px}
+    .pd-buy{display:none}
+    .pd-info.needs-size .pd-select{display:none}
+    .pd-mbar{display:flex;position:-webkit-sticky;position:sticky;bottom:16px;z-index:50;margin-top:10px;height:48px;
+      align-items:center;justify-content:space-between;padding:0 20px;background:#000;color:#fff!important;font-size:14px;font-weight:500}
+    .pd-mbar:hover{background:var(--pd-blue)}
+    .pd-desc{margin-top:32px}
+    .pd-rec{padding:60px 3px 40px}
+    .pd-rec h2{margin-bottom:24px}
+    .pd-rec__grid{grid-template-columns:repeat(2,1fr);gap:3px}
+    .pd-card__info{flex-direction:column;gap:4px;padding:8px 6px 14px}
+    .pd-foot{grid-template-columns:1fr auto;grid-template-areas:"logo logo" "copy right";height:auto;row-gap:14px;
+      margin:30px 10px 10px;padding:14px 16px;border-radius:20px}
+    .pd-foot__logo{grid-area:logo;justify-self:center}
+    .pd-foot__copy{grid-area:copy}
+    .pd-foot__r{grid-area:right;gap:12px}
+    .pd-zoom__box{padding:40px 14px 14px}
+    .pd-zoom__box img{max-height:62vh}
+  }
+</style>
+<div class="pd">
+  <header class="pd-header">
+    <div class="pd-announce">
+      <span class="is-on">Free shipping on every order</span>
+      <span>Realtree Balloons &mdash; available now</span>
+      <span>&quot;only&quot; for outdoor use</span>
+    </div>
+    <div class="pd-pill">
+      <nav class="pd-nav">
+        <a href="/shop">shop</a>
+        <a href="/lookbook">lookbook</a>
+      </nav>
+      <a class="pd-logo" href="/"><img src="https://strklvskyy11.github.io/exmptmind-content/brand/logo-site.png" alt="exmptmind&trade;"></a>
+      <nav class="pd-nav pd-nav--r">
+        <a href="/ru/shop/crop-jersey-tee-black">&#1088;&#1091;</a>
+        <a href="/about">about</a>
+        <a class="pd-bag" href="#bag" data-bag>bag<span data-bag-count="dash"></span></a>
+      </nav>
+      <div class="pd-mob">
+        <a href="#bag" data-bag aria-label="Bag"><svg viewBox="0 0 24 24"><path d="M5 8h14l-1 13H6L5 8z"/><path d="M9 8V6a3 3 0 016 0v2"/></svg><span class="pd-mob__count" data-bag-count="num"></span></a>
+        <button class="pd-burger" type="button" aria-label="Menu">
+          <svg class="i-open" viewBox="0 0 24 24"><path d="M3 8h18M3 16h18"/></svg>
+          <svg class="i-close" viewBox="0 0 24 24"><path d="M5 5l14 14M19 5L5 19"/></svg>
+        </button>
+      </div>
+    </div>
+    <nav class="pd-menu">
+      <a href="/shop">shop</a>
+      <a href="/lookbook">lookbook</a>
+      <a href="/about">about</a>
+      <div class="pd-menu__lang"><a href="/ru/shop/crop-jersey-tee-black">&#1088;&#1091;</a><a href="/shop/crop-jersey-tee-black">eng</a></div>
+    </nav>
+  </header>
+  <main class="pd-main">
+    <div class="pd-gallerywrap">
+      <div class="pd-gallery">
+        <figure><img src="https://strklvskyy11.github.io/exmptmind-content/products/w/crop-jersey-tee-black-01-IMG_5872-1200.webp" srcset="https://strklvskyy11.github.io/exmptmind-content/products/w/crop-jersey-tee-black-01-IMG_5872-480.webp 480w, https://strklvskyy11.github.io/exmptmind-content/products/w/crop-jersey-tee-black-01-IMG_5872-800.webp 800w, https://strklvskyy11.github.io/exmptmind-content/products/w/crop-jersey-tee-black-01-IMG_5872-1200.webp 1200w, https://strklvskyy11.github.io/exmptmind-content/products/w/crop-jersey-tee-black-01-IMG_5872-1600.webp 1600w, https://strklvskyy11.github.io/exmptmind-content/products/w/crop-jersey-tee-black-01-IMG_5872-2000.webp 2000w, https://strklvskyy11.github.io/exmptmind-content/products/w/crop-jersey-tee-black-01-IMG_5872-2560.webp 2560w" sizes="(max-width:820px) 88vw, 50vw" alt="Crop Jersey Tee" fetchpriority="high" decoding="async" style="background:url(data:image/webp;base64,UklGRogAAABXRUJQVlA4IHwAAACQBQCdASoYACsAPu1iqk6ppSOptVQIATAdiWcA0bw2R6F2VO8AQHL7ZBpPnsecid5zvyR6AAD+uckXGeYnVOKhJvDS6xwqk8jQkvLLujYPLiFbQAxBoMDnfwGZ4TNyLwATX2n8UiBJrA7CnKa9ggQK8fagq9T+i+LcHgAA) 50% 50%/cover"></figure>
+        <figure><img src="https://strklvskyy11.github.io/exmptmind-content/products/w/crop-jersey-tee-black-02-IMG_5883-1200.webp" srcset="https://strklvskyy11.github.io/exmptmind-content/products/w/crop-jersey-tee-black-02-IMG_5883-480.webp 480w, https://strklvskyy11.github.io/exmptmind-content/products/w/crop-jersey-tee-black-02-IMG_5883-800.webp 800w, https://strklvskyy11.github.io/exmptmind-content/products/w/crop-jersey-tee-black-02-IMG_5883-1200.webp 1200w, https://strklvskyy11.github.io/exmptmind-content/products/w/crop-jersey-tee-black-02-IMG_5883-1600.webp 1600w, https://strklvskyy11.github.io/exmptmind-content/products/w/crop-jersey-tee-black-02-IMG_5883-2000.webp 2000w, https://strklvskyy11.github.io/exmptmind-content/products/w/crop-jersey-tee-black-02-IMG_5883-2560.webp 2560w" sizes="(max-width:820px) 88vw, 50vw" alt="" loading="lazy" decoding="async" style="background:url(data:image/webp;base64,UklGRpAAAABXRUJQVlA4IIQAAAAwBgCdASoYACsAPu1ir06ppSSiMBVaqTAdiWcA0MwqGqqVG1my1wGFtMxVaobTFr1Kt/W8+QJuasqIAP7M0GX/zXCWyAs1bm0p24lG7HM6aXbBd859WrYwOswDo0bjIvLu3p5SgtHpmnkYynZrfQ3+pi00QJYkEHJqQ0AJtPJmA+fAAAA=) 50% 50%/cover"></figure>
+        <figure><img src="https://strklvskyy11.github.io/exmptmind-content/products/w/crop-jersey-tee-black-03-IMG_5887-1200.webp" srcset="https://strklvskyy11.github.io/exmptmind-content/products/w/crop-jersey-tee-black-03-IMG_5887-480.webp 480w, https://strklvskyy11.github.io/exmptmind-content/products/w/crop-jersey-tee-black-03-IMG_5887-800.webp 800w, https://strklvskyy11.github.io/exmptmind-content/products/w/crop-jersey-tee-black-03-IMG_5887-1200.webp 1200w, https://strklvskyy11.github.io/exmptmind-content/products/w/crop-jersey-tee-black-03-IMG_5887-1600.webp 1600w, https://strklvskyy11.github.io/exmptmind-content/products/w/crop-jersey-tee-black-03-IMG_5887-2000.webp 2000w, https://strklvskyy11.github.io/exmptmind-content/products/w/crop-jersey-tee-black-03-IMG_5887-2560.webp 2560w" sizes="(max-width:820px) 88vw, 50vw" alt="" loading="lazy" decoding="async" style="background:url(data:image/webp;base64,UklGRsIAAABXRUJQVlA4ILYAAAAwBgCdASoYACsAPu1gq04ppSQiKrgN+TAdiWcAyngLKqyARIeY7m0jkL1hB4Ss5UcRXeNYYL0LE4wAAP7wy0OeWmkzRB5pt79cFu7De7P+9vQWQrxnBRCh9jyB9CjJdcGNqWWy9Ajs/aAjjXAbcNp4ilSXP82ESXzFewkxOyQmBGpgOmJQlaBXIWkBwsN7byw4CDISUz1YmiGKxPzW6UcUYsJE5Nx6f9AWge73Pg8KwGKf1icAAA==) 50% 50%/cover"></figure>
+        <figure><img src="https://strklvskyy11.github.io/exmptmind-content/products/w/crop-jersey-tee-black-04-IMG_5865-1200.webp" srcset="https://strklvskyy11.github.io/exmptmind-content/products/w/crop-jersey-tee-black-04-IMG_5865-480.webp 480w, https://strklvskyy11.github.io/exmptmind-content/products/w/crop-jersey-tee-black-04-IMG_5865-800.webp 800w, https://strklvskyy11.github.io/exmptmind-content/products/w/crop-jersey-tee-black-04-IMG_5865-1200.webp 1200w, https://strklvskyy11.github.io/exmptmind-content/products/w/crop-jersey-tee-black-04-IMG_5865-1600.webp 1600w, https://strklvskyy11.github.io/exmptmind-content/products/w/crop-jersey-tee-black-04-IMG_5865-2000.webp 2000w, https://strklvskyy11.github.io/exmptmind-content/products/w/crop-jersey-tee-black-04-IMG_5865-2560.webp 2560w" sizes="(max-width:820px) 88vw, 50vw" alt="" loading="lazy" decoding="async" style="background:url(data:image/webp;base64,UklGRqgAAABXRUJQVlA4IJwAAADQBQCdASoYACsAPu1gqk6ppSOiNVQIATAdiWcA0BgoeSG+M5XrVDNV2Bqqjrjl0/7Ht5s29JoAAP6rEySpUnO2RsX1d/xKpiDyAPf6dK1L+Cz1Uhe6AvlKZeTxugh9Sqq6ND9AKn6IGttWpM2Uq1y0OtU4ZlQMJ9R9eSuVry3lBJA7qWxhnh94DTQZnVnikdF1afPSCN/6koAAAAA=) 50% 50%/cover"></figure>
+        <figure><img src="https://strklvskyy11.github.io/exmptmind-content/products/w/crop-jersey-tee-black-05-IMG_6559-1200.webp" srcset="https://strklvskyy11.github.io/exmptmind-content/products/w/crop-jersey-tee-black-05-IMG_6559-480.webp 480w, https://strklvskyy11.github.io/exmptmind-content/products/w/crop-jersey-tee-black-05-IMG_6559-800.webp 800w, https://strklvskyy11.github.io/exmptmind-content/products/w/crop-jersey-tee-black-05-IMG_6559-1200.webp 1200w, https://strklvskyy11.github.io/exmptmind-content/products/w/crop-jersey-tee-black-05-IMG_6559-1600.webp 1600w, https://strklvskyy11.github.io/exmptmind-content/products/w/crop-jersey-tee-black-05-IMG_6559-2000.webp 2000w, https://strklvskyy11.github.io/exmptmind-content/products/w/crop-jersey-tee-black-05-IMG_6559-2536.webp 2536w" sizes="(max-width:820px) 88vw, 50vw" alt="" loading="lazy" decoding="async" style="background:url(data:image/webp;base64,UklGRooAAABXRUJQVlA4IH4AAADwBACdASoYAB4APu1srlIppaQiqAgBMB2JZQCsMxgAod18oaLoGMhnWHXOhajZoAAA/Jy9tzVX2Ij0tDRnK3SJ1yiVFeGrqJ3dKoH+lOTzoosX0oYMFE9XRd6StHvsXlQAjC7wE5ATOvR4t1YswYy5FhOVyPxPpAm/RoMAAAA=) 50% 50%/cover"></figure>
+        <figure><img src="https://strklvskyy11.github.io/exmptmind-content/products/w/crop-jersey-tee-black-06-IMG_6595_2-1200.webp" srcset="https://strklvskyy11.github.io/exmptmind-content/products/w/crop-jersey-tee-black-06-IMG_6595_2-480.webp 480w, https://strklvskyy11.github.io/exmptmind-content/products/w/crop-jersey-tee-black-06-IMG_6595_2-800.webp 800w, https://strklvskyy11.github.io/exmptmind-content/products/w/crop-jersey-tee-black-06-IMG_6595_2-1200.webp 1200w, https://strklvskyy11.github.io/exmptmind-content/products/w/crop-jersey-tee-black-06-IMG_6595_2-1600.webp 1600w, https://strklvskyy11.github.io/exmptmind-content/products/w/crop-jersey-tee-black-06-IMG_6595_2-2000.webp 2000w, https://strklvskyy11.github.io/exmptmind-content/products/w/crop-jersey-tee-black-06-IMG_6595_2-2560.webp 2560w" sizes="(max-width:820px) 88vw, 50vw" alt="" loading="lazy" decoding="async" style="background:url(data:image/webp;base64,UklGRpwAAABXRUJQVlA4IJAAAADQBACdASoYACAAPuVgpk2pJaOiMAwBIByJZQDH5BuZjgK1mTGLPlFwfzjhMof2AAD+0qAqAdgT+fqPauwzqL6GXuZLv8QR6hpa7XSWwGxbAFTBpXeVlL6Nb8HOS+0738m8tkeaEUmopIV5Yn/hP6FCZgm29MfR3ii8Am7NMuOAV2dmTa6hGNaIwtda7RIgAAA=) 50% 50%/cover"></figure>
+      </div>
+      <span class="pd-gcount"><b>1</b> / <i>6</i></span>
+    </div>
+    <aside class="pd-info">
+      <div class="pd-info__in">
+        <div class="pd-title"><h1>Crop Jersey Tee</h1><span>4&nbsp;900&nbsp;&#8381;</span></div>
+        <div class="pd-swatches">
+          <a class="pd-swatch is-active" href="/shop/crop-jersey-tee-black" aria-label="Black" style="background-color:#111111"></a>
+          <a class="pd-swatch" href="/shop/crop-jersey-tee-white" aria-label="White" style="background-color:#f1f1ef"></a>
+        </div>
+        <p class="pd-colorname">Black</p>
+        <div class="pd-sizes">
+          <button class="pd-size is-active" type="button">One Size</button>
+        </div>
+        <a class="pd-mbar" data-cart="add" href="https://exmptmind.com/shop-legacy#!/tproduct/1165615896-8198546817191"><span>4&nbsp;900&nbsp;&#8381;</span><span class="pd-mbar__cta">Add to Bag</span><span class="pd-mbar__pick">select size</span></a>
+        <div class="pd-select">select size</div>
+        <div class="pd-buy">
+          <a class="pd-btn" data-cart="add" href="https://exmptmind.com/shop-legacy#!/tproduct/1165615896-8198546817191">Add to Bag</a>
+          <a class="pd-btn" data-cart="buy" href="https://exmptmind.com/shop-legacy#!/tproduct/1165615896-8198546817191">Buy Now</a>
+        </div>
+        <div class="pd-desc">
+          <p>100% organic cotton jersey, 300 g/sqm</p>
+          <p>Relaxed, crop-fit with a boxy-oversize silhouette</p>
+          <p>3/4 sleeves</p>
+          <p>Graphic on chest, back and sleeves</p>
+          <p>ONE SIZE FITS ALL</p>
+        </div>
+      </div>
+    </aside>
+  </main>
+  <section class="pd-rec">
+    <h2>you might also like</h2>
+    <div class="pd-rec__grid">
+      <a class="pd-card" href="/shop/crop-jersey-tee-white">
+        <div class="pd-card__media">
+          <img src="https://strklvskyy11.github.io/exmptmind-content/products/w/crop-jersey-tee-white-01-IMG_5864-1200.webp" srcset="https://strklvskyy11.github.io/exmptmind-content/products/w/crop-jersey-tee-white-01-IMG_5864-480.webp 480w, https://strklvskyy11.github.io/exmptmind-content/products/w/crop-jersey-tee-white-01-IMG_5864-800.webp 800w, https://strklvskyy11.github.io/exmptmind-content/products/w/crop-jersey-tee-white-01-IMG_5864-1200.webp 1200w, https://strklvskyy11.github.io/exmptmind-content/products/w/crop-jersey-tee-white-01-IMG_5864-1600.webp 1600w, https://strklvskyy11.github.io/exmptmind-content/products/w/crop-jersey-tee-white-01-IMG_5864-2000.webp 2000w, https://strklvskyy11.github.io/exmptmind-content/products/w/crop-jersey-tee-white-01-IMG_5864-2560.webp 2560w" sizes="(max-width:820px) 50vw, 25vw" alt="Crop Jersey Tee White" loading="lazy" decoding="async" style="background:url(data:image/webp;base64,UklGRpoAAABXRUJQVlA4II4AAAAQBgCdASoYACsAPu1gqk6ppSOiNVQIATAdiWcAyUw1t9HhVzxY866u5VjKPWku03ysxJcjHCCk1AAA/r54FIpcp0mv1eLt+hILOnlZ2JQgXjTMYIwaEukWoLXXjGRSjNMsDK9OrkzScygXdjBjhS4KKdHyR/QWP2tM7JLOC4TO5lVvLEUGKJliYYRggAAA) 50% 50%/cover">
+          <img src="https://strklvskyy11.github.io/exmptmind-content/products/w/crop-jersey-tee-white-02-IMG_5835-1200.webp" srcset="https://strklvskyy11.github.io/exmptmind-content/products/w/crop-jersey-tee-white-02-IMG_5835-480.webp 480w, https://strklvskyy11.github.io/exmptmind-content/products/w/crop-jersey-tee-white-02-IMG_5835-800.webp 800w, https://strklvskyy11.github.io/exmptmind-content/products/w/crop-jersey-tee-white-02-IMG_5835-1200.webp 1200w, https://strklvskyy11.github.io/exmptmind-content/products/w/crop-jersey-tee-white-02-IMG_5835-1600.webp 1600w, https://strklvskyy11.github.io/exmptmind-content/products/w/crop-jersey-tee-white-02-IMG_5835-2000.webp 2000w, https://strklvskyy11.github.io/exmptmind-content/products/w/crop-jersey-tee-white-02-IMG_5835-2268.webp 2268w" sizes="(max-width:820px) 50vw, 25vw" alt="" class="alt" loading="lazy" decoding="async" style="background:url(data:image/webp;base64,UklGRswAAABXRUJQVlA4IMAAAABwBgCdASoYACsAPu1kq1CppSOiqrgMATAdiWcAxcncAP5mwgR6wdb337/o8y1SYGMg09e0+7PO+8qpOsAA/vKpuk1MqWqk/ztaTACbrbKhoRWunhGrxybWdnRDcN2TbnmmvWRxT/2y52UNu5g7UR0qng0GHnYhCxP8dTYFYgq1mZ8rESXy8BOmwQ3VMQxsmVOUSJb473RFa0G4Bz2B7PAw3z+ebQRip6VN7T+L8YrX0k3Zx4RUYAQkqH8YGVgAAAA=) 50% 50%/cover">
+        </div>
+        <div class="pd-card__info"><p>Crop Jersey Tee<span>White</span></p><p>4&nbsp;900&nbsp;&#8381;</p></div>
+      </a>
+      <a class="pd-card is-pack" href="/shop/realtree-balloons">
+        <div class="pd-card__media">
+          <span class="pd-card__tag">new</span><img src="https://strklvskyy11.github.io/exmptmind-content/products/w/realtree-balloons-pack-front-1070.webp" srcset="https://strklvskyy11.github.io/exmptmind-content/products/w/realtree-balloons-pack-front-480.webp 480w, https://strklvskyy11.github.io/exmptmind-content/products/w/realtree-balloons-pack-front-800.webp 800w, https://strklvskyy11.github.io/exmptmind-content/products/w/realtree-balloons-pack-front-1070.webp 1070w" sizes="(max-width:820px) 50vw, 25vw" alt="Realtree Balloons Light Khaki Camo" loading="lazy" decoding="async" style="background:url(data:image/webp;base64,UklGRngAAABXRUJQVlA4IGwAAADwBACdASoYACEAPt1cpU2opSOiNUgBEBuJZwDO7Cza1TCAPMB18PURDqFsI9IcoBAA/vHEuCbhcdqkARunmolBgZIMwzXXFwHWM873DebZ4qEBxweuLEa0+PraU2vwo1CFujNd6n9s+cn8AAA=) 50% 50%/cover">
+          <img src="https://strklvskyy11.github.io/exmptmind-content/products/w/realtree-balloons-pack-back-1070.webp" srcset="https://strklvskyy11.github.io/exmptmind-content/products/w/realtree-balloons-pack-back-480.webp 480w, https://strklvskyy11.github.io/exmptmind-content/products/w/realtree-balloons-pack-back-800.webp 800w, https://strklvskyy11.github.io/exmptmind-content/products/w/realtree-balloons-pack-back-1070.webp 1070w" sizes="(max-width:820px) 50vw, 25vw" alt="" class="alt" loading="lazy" decoding="async" style="background:url(data:image/webp;base64,UklGRnwAAABXRUJQVlA4IHAAAACQBACdASoYACEAPt1YpE2opSOiNUgBEBuJZQDPKCzaxKZzi5SQAi4NLl+vDIAA/vHE32MGvIWIs69qleSTYDPPs5RlGaV3dRqhmU+C/d3iVrdjfU4Zmpee+juw8cipyQr++A6hFhy6OVlv7yIAAAAA) 50% 50%/cover">
+        </div>
+        <div class="pd-card__info"><p>Realtree Balloons<span>Light Khaki Camo</span></p><p>14&nbsp;700&nbsp;&#8381;</p></div>
+      </a>
+      <a class="pd-card" href="/shop/og-cargo-pants-hiker-moss">
+        <div class="pd-card__media">
+          <img src="https://strklvskyy11.github.io/exmptmind-content/products/w/og-cargo-pants-hiker-moss-01-13-1200.webp" srcset="https://strklvskyy11.github.io/exmptmind-content/products/w/og-cargo-pants-hiker-moss-01-13-480.webp 480w, https://strklvskyy11.github.io/exmptmind-content/products/w/og-cargo-pants-hiker-moss-01-13-800.webp 800w, https://strklvskyy11.github.io/exmptmind-content/products/w/og-cargo-pants-hiker-moss-01-13-1200.webp 1200w, https://strklvskyy11.github.io/exmptmind-content/products/w/og-cargo-pants-hiker-moss-01-13-1600.webp 1600w, https://strklvskyy11.github.io/exmptmind-content/products/w/og-cargo-pants-hiker-moss-01-13-2000.webp 2000w, https://strklvskyy11.github.io/exmptmind-content/products/w/og-cargo-pants-hiker-moss-01-13-2560.webp 2560w" sizes="(max-width:820px) 50vw, 25vw" alt="OG Cargo Pants Hiker Moss" loading="lazy" decoding="async" style="background:url(data:image/webp;base64,UklGRqgAAABXRUJQVlA4IJwAAAAQBgCdASoYACQAPu1orE2ppiSiKqwBMB2JZwDO7BISWeq6+43PPKJaZUr3wnzLknSEYXZ2gKZRVAAA/nG2nGSd9u6BWfoz2naZO6cVS2Ai73yJEIcjx6QM1V8Zlq/OLWGFG1hp07cU+a/uqnAQDP5LQ86ZbBMg0iSxlfdBcrdkLYVM37+zkfq+ukcziIstONSwRpkOVFY1/XIAAAA=) 50% 50%/cover">
+          <img src="https://strklvskyy11.github.io/exmptmind-content/products/w/og-cargo-pants-hiker-moss-02-29-1200.webp" srcset="https://strklvskyy11.github.io/exmptmind-content/products/w/og-cargo-pants-hiker-moss-02-29-480.webp 480w, https://strklvskyy11.github.io/exmptmind-content/products/w/og-cargo-pants-hiker-moss-02-29-800.webp 800w, https://strklvskyy11.github.io/exmptmind-content/products/w/og-cargo-pants-hiker-moss-02-29-1200.webp 1200w, https://strklvskyy11.github.io/exmptmind-content/products/w/og-cargo-pants-hiker-moss-02-29-1600.webp 1600w, https://strklvskyy11.github.io/exmptmind-content/products/w/og-cargo-pants-hiker-moss-02-29-2000.webp 2000w, https://strklvskyy11.github.io/exmptmind-content/products/w/og-cargo-pants-hiker-moss-02-29-2560.webp 2560w" sizes="(max-width:820px) 50vw, 25vw" alt="" class="alt" loading="lazy" decoding="async" style="background:url(data:image/webp;base64,UklGRugAAABXRUJQVlA4INwAAACwBgCdASoYACQAPu1uslKppiSipWmZMB2JYwDC+CM8Tlkf3cEYXvl7z1TZU3n2t5YTxVbwDPTHuBeTSHJIAAD+6Vh9y3CZ7tynCMn1qITfULo12AWm+ujaF9SKN7/iKhkClPgi0fasgy1qXQSzsZpOflfI248zWTWL5QfygmAL052wHE86elFrsbwruUJzG01NM+uESvGi6mBNQTsmkUKPIemsm/XtTMXHOZz7GjXqmK1j7R3jQRNWW1s5ErK2l2UwU7z2YUpZgettpkfUFqJNyqNutfo0IM5DAAAA) 50% 50%/cover">
+        </div>
+        <div class="pd-card__info"><p>OG Cargo Pants<span>Hiker Moss</span></p><p>12&nbsp;900&nbsp;&#8381;</p></div>
+      </a>
+      <a class="pd-card" href="/shop/og-cargo-pants-utility-black">
+        <div class="pd-card__media">
+          <img src="https://strklvskyy11.github.io/exmptmind-content/products/w/og-cargo-pants-utility-black-01-32-1200.webp" srcset="https://strklvskyy11.github.io/exmptmind-content/products/w/og-cargo-pants-utility-black-01-32-480.webp 480w, https://strklvskyy11.github.io/exmptmind-content/products/w/og-cargo-pants-utility-black-01-32-800.webp 800w, https://strklvskyy11.github.io/exmptmind-content/products/w/og-cargo-pants-utility-black-01-32-1200.webp 1200w, https://strklvskyy11.github.io/exmptmind-content/products/w/og-cargo-pants-utility-black-01-32-1600.webp 1600w, https://strklvskyy11.github.io/exmptmind-content/products/w/og-cargo-pants-utility-black-01-32-2000.webp 2000w, https://strklvskyy11.github.io/exmptmind-content/products/w/og-cargo-pants-utility-black-01-32-2560.webp 2560w" sizes="(max-width:820px) 50vw, 25vw" alt="OG Cargo Pants Utility Black" loading="lazy" decoding="async" style="background:url(data:image/webp;base64,UklGRqoAAABXRUJQVlA4IJ4AAABwBgCdASoYACQAPu1mq1AppSOiqrgMATAdiWUAygAHv+tUtyuBm/1YXINbBfJG3qUu5+v7g+TWr8CzwAAA/rvqLcWAarWsydOk1zYhAv0moKn7DAXpG8PNT3YZyFUDvMIJf45re7eVEvuoPm6r/QX5FNHKkOLS4SpOWFz7Hdqck6S9fWQ0V9+y1FUmpBj3p+xIa7/b4hkM0KD37AAAAA==) 50% 50%/cover">
+          <img src="https://strklvskyy11.github.io/exmptmind-content/products/w/og-cargo-pants-utility-black-02-10-1200.webp" srcset="https://strklvskyy11.github.io/exmptmind-content/products/w/og-cargo-pants-utility-black-02-10-480.webp 480w, https://strklvskyy11.github.io/exmptmind-content/products/w/og-cargo-pants-utility-black-02-10-800.webp 800w, https://strklvskyy11.github.io/exmptmind-content/products/w/og-cargo-pants-utility-black-02-10-1200.webp 1200w, https://strklvskyy11.github.io/exmptmind-content/products/w/og-cargo-pants-utility-black-02-10-1600.webp 1600w, https://strklvskyy11.github.io/exmptmind-content/products/w/og-cargo-pants-utility-black-02-10-2000.webp 2000w, https://strklvskyy11.github.io/exmptmind-content/products/w/og-cargo-pants-utility-black-02-10-2304.webp 2304w" sizes="(max-width:820px) 50vw, 25vw" alt="" class="alt" loading="lazy" decoding="async" style="background:url(data:image/webp;base64,UklGRrYAAABXRUJQVlA4IKoAAADQBQCdASoYACQAPu1qqFAppiOiqqoBMB2JQBS1gZ/Ca27iQxQp9MdqHVG6DN6O2P/eun+kmMZAAP0cnq4s2HE2ggXrsFmimCIyibBowIOSP4Tco4m7MnQuLkjy1RFC5XZEyWv2ceN8mDMiX5Lzlhl0cIzF3IyBTQZ3yXu3qVtOoW2CYVnnMUa7KJNW+G88CWjROJvu+0myBykcuMnefCES2ZsrA5esgwgoAA==) 50% 50%/cover">
+        </div>
+        <div class="pd-card__info"><p>OG Cargo Pants<span>Utility Black</span></p><p>12&nbsp;900&nbsp;&#8381;</p></div>
+      </a>
+    </div>
+  </section>
+  <footer class="pd-foot">
+    <span class="pd-foot__copy">Beyond the Limits&reg; 2026</span>
+    <a class="pd-foot__logo" href="/"><img src="https://strklvskyy11.github.io/exmptmind-content/brand/logo-site.png" alt="exmptmind&trade;"></a>
+    <div class="pd-foot__r">
+      <a href="https://www.instagram.com/exmptmind/" target="_blank" rel="noopener">Instagram</a>
+      <a href="https://t.me/exmptmind" target="_blank" rel="noopener">Telegram</a>
+      <a href="https://pinterest.com/exmptmind/" target="_blank" rel="noopener">Pinterest</a>
+      <span class="pd-foot__lang"><a href="/ru/shop/crop-jersey-tee-black">&#1088;&#1091;</a>/<a href="/shop/crop-jersey-tee-black">eng</a></span>
+    </div>
+  </footer>
+  <div class="pd-lb" role="dialog" aria-label="Photos">
+    <div class="pd-lb__thumbs">
+      <button type="button" data-i="0"><img src="https://strklvskyy11.github.io/exmptmind-content/products/w/crop-jersey-tee-black-01-IMG_5872-480.webp" alt="" loading="lazy" decoding="async"></button>
+      <button type="button" data-i="1"><img src="https://strklvskyy11.github.io/exmptmind-content/products/w/crop-jersey-tee-black-02-IMG_5883-480.webp" alt="" loading="lazy" decoding="async"></button>
+      <button type="button" data-i="2"><img src="https://strklvskyy11.github.io/exmptmind-content/products/w/crop-jersey-tee-black-03-IMG_5887-480.webp" alt="" loading="lazy" decoding="async"></button>
+      <button type="button" data-i="3"><img src="https://strklvskyy11.github.io/exmptmind-content/products/w/crop-jersey-tee-black-04-IMG_5865-480.webp" alt="" loading="lazy" decoding="async"></button>
+      <button type="button" data-i="4"><img src="https://strklvskyy11.github.io/exmptmind-content/products/w/crop-jersey-tee-black-05-IMG_6559-480.webp" alt="" loading="lazy" decoding="async"></button>
+      <button type="button" data-i="5"><img src="https://strklvskyy11.github.io/exmptmind-content/products/w/crop-jersey-tee-black-06-IMG_6595_2-480.webp" alt="" loading="lazy" decoding="async"></button>
+    </div>
+    <div class="pd-lb__stage">
+      <figure><img src="https://strklvskyy11.github.io/exmptmind-content/products/w/crop-jersey-tee-black-01-IMG_5872-1200.webp" srcset="https://strklvskyy11.github.io/exmptmind-content/products/w/crop-jersey-tee-black-01-IMG_5872-480.webp 480w, https://strklvskyy11.github.io/exmptmind-content/products/w/crop-jersey-tee-black-01-IMG_5872-800.webp 800w, https://strklvskyy11.github.io/exmptmind-content/products/w/crop-jersey-tee-black-01-IMG_5872-1200.webp 1200w, https://strklvskyy11.github.io/exmptmind-content/products/w/crop-jersey-tee-black-01-IMG_5872-1600.webp 1600w, https://strklvskyy11.github.io/exmptmind-content/products/w/crop-jersey-tee-black-01-IMG_5872-2000.webp 2000w, https://strklvskyy11.github.io/exmptmind-content/products/w/crop-jersey-tee-black-01-IMG_5872-2560.webp 2560w" sizes="100vw" alt="" loading="lazy" decoding="async" style="background:url(data:image/webp;base64,UklGRogAAABXRUJQVlA4IHwAAACQBQCdASoYACsAPu1iqk6ppSOptVQIATAdiWcA0bw2R6F2VO8AQHL7ZBpPnsecid5zvyR6AAD+uckXGeYnVOKhJvDS6xwqk8jQkvLLujYPLiFbQAxBoMDnfwGZ4TNyLwATX2n8UiBJrA7CnKa9ggQK8fagq9T+i+LcHgAA) 50% 50%/cover"></figure>
+      <figure><img src="https://strklvskyy11.github.io/exmptmind-content/products/w/crop-jersey-tee-black-02-IMG_5883-1200.webp" srcset="https://strklvskyy11.github.io/exmptmind-content/products/w/crop-jersey-tee-black-02-IMG_5883-480.webp 480w, https://strklvskyy11.github.io/exmptmind-content/products/w/crop-jersey-tee-black-02-IMG_5883-800.webp 800w, https://strklvskyy11.github.io/exmptmind-content/products/w/crop-jersey-tee-black-02-IMG_5883-1200.webp 1200w, https://strklvskyy11.github.io/exmptmind-content/products/w/crop-jersey-tee-black-02-IMG_5883-1600.webp 1600w, https://strklvskyy11.github.io/exmptmind-content/products/w/crop-jersey-tee-black-02-IMG_5883-2000.webp 2000w, https://strklvskyy11.github.io/exmptmind-content/products/w/crop-jersey-tee-black-02-IMG_5883-2560.webp 2560w" sizes="100vw" alt="" loading="lazy" decoding="async" style="background:url(data:image/webp;base64,UklGRpAAAABXRUJQVlA4IIQAAAAwBgCdASoYACsAPu1ir06ppSSiMBVaqTAdiWcA0MwqGqqVG1my1wGFtMxVaobTFr1Kt/W8+QJuasqIAP7M0GX/zXCWyAs1bm0p24lG7HM6aXbBd859WrYwOswDo0bjIvLu3p5SgtHpmnkYynZrfQ3+pi00QJYkEHJqQ0AJtPJmA+fAAAA=) 50% 50%/cover"></figure>
+      <figure><img src="https://strklvskyy11.github.io/exmptmind-content/products/w/crop-jersey-tee-black-03-IMG_5887-1200.webp" srcset="https://strklvskyy11.github.io/exmptmind-content/products/w/crop-jersey-tee-black-03-IMG_5887-480.webp 480w, https://strklvskyy11.github.io/exmptmind-content/products/w/crop-jersey-tee-black-03-IMG_5887-800.webp 800w, https://strklvskyy11.github.io/exmptmind-content/products/w/crop-jersey-tee-black-03-IMG_5887-1200.webp 1200w, https://strklvskyy11.github.io/exmptmind-content/products/w/crop-jersey-tee-black-03-IMG_5887-1600.webp 1600w, https://strklvskyy11.github.io/exmptmind-content/products/w/crop-jersey-tee-black-03-IMG_5887-2000.webp 2000w, https://strklvskyy11.github.io/exmptmind-content/products/w/crop-jersey-tee-black-03-IMG_5887-2560.webp 2560w" sizes="100vw" alt="" loading="lazy" decoding="async" style="background:url(data:image/webp;base64,UklGRsIAAABXRUJQVlA4ILYAAAAwBgCdASoYACsAPu1gq04ppSQiKrgN+TAdiWcAyngLKqyARIeY7m0jkL1hB4Ss5UcRXeNYYL0LE4wAAP7wy0OeWmkzRB5pt79cFu7De7P+9vQWQrxnBRCh9jyB9CjJdcGNqWWy9Ajs/aAjjXAbcNp4ilSXP82ESXzFewkxOyQmBGpgOmJQlaBXIWkBwsN7byw4CDISUz1YmiGKxPzW6UcUYsJE5Nx6f9AWge73Pg8KwGKf1icAAA==) 50% 50%/cover"></figure>
+      <figure><img src="https://strklvskyy11.github.io/exmptmind-content/products/w/crop-jersey-tee-black-04-IMG_5865-1200.webp" srcset="https://strklvskyy11.github.io/exmptmind-content/products/w/crop-jersey-tee-black-04-IMG_5865-480.webp 480w, https://strklvskyy11.github.io/exmptmind-content/products/w/crop-jersey-tee-black-04-IMG_5865-800.webp 800w, https://strklvskyy11.github.io/exmptmind-content/products/w/crop-jersey-tee-black-04-IMG_5865-1200.webp 1200w, https://strklvskyy11.github.io/exmptmind-content/products/w/crop-jersey-tee-black-04-IMG_5865-1600.webp 1600w, https://strklvskyy11.github.io/exmptmind-content/products/w/crop-jersey-tee-black-04-IMG_5865-2000.webp 2000w, https://strklvskyy11.github.io/exmptmind-content/products/w/crop-jersey-tee-black-04-IMG_5865-2560.webp 2560w" sizes="100vw" alt="" loading="lazy" decoding="async" style="background:url(data:image/webp;base64,UklGRqgAAABXRUJQVlA4IJwAAADQBQCdASoYACsAPu1gqk6ppSOiNVQIATAdiWcA0BgoeSG+M5XrVDNV2Bqqjrjl0/7Ht5s29JoAAP6rEySpUnO2RsX1d/xKpiDyAPf6dK1L+Cz1Uhe6AvlKZeTxugh9Sqq6ND9AKn6IGttWpM2Uq1y0OtU4ZlQMJ9R9eSuVry3lBJA7qWxhnh94DTQZnVnikdF1afPSCN/6koAAAAA=) 50% 50%/cover"></figure>
+      <figure><img src="https://strklvskyy11.github.io/exmptmind-content/products/w/crop-jersey-tee-black-05-IMG_6559-1200.webp" srcset="https://strklvskyy11.github.io/exmptmind-content/products/w/crop-jersey-tee-black-05-IMG_6559-480.webp 480w, https://strklvskyy11.github.io/exmptmind-content/products/w/crop-jersey-tee-black-05-IMG_6559-800.webp 800w, https://strklvskyy11.github.io/exmptmind-content/products/w/crop-jersey-tee-black-05-IMG_6559-1200.webp 1200w, https://strklvskyy11.github.io/exmptmind-content/products/w/crop-jersey-tee-black-05-IMG_6559-1600.webp 1600w, https://strklvskyy11.github.io/exmptmind-content/products/w/crop-jersey-tee-black-05-IMG_6559-2000.webp 2000w, https://strklvskyy11.github.io/exmptmind-content/products/w/crop-jersey-tee-black-05-IMG_6559-2536.webp 2536w" sizes="100vw" alt="" loading="lazy" decoding="async" style="background:url(data:image/webp;base64,UklGRooAAABXRUJQVlA4IH4AAADwBACdASoYAB4APu1srlIppaQiqAgBMB2JZQCsMxgAod18oaLoGMhnWHXOhajZoAAA/Jy9tzVX2Ij0tDRnK3SJ1yiVFeGrqJ3dKoH+lOTzoosX0oYMFE9XRd6StHvsXlQAjC7wE5ATOvR4t1YswYy5FhOVyPxPpAm/RoMAAAA=) 50% 50%/cover"></figure>
+      <figure><img src="https://strklvskyy11.github.io/exmptmind-content/products/w/crop-jersey-tee-black-06-IMG_6595_2-1200.webp" srcset="https://strklvskyy11.github.io/exmptmind-content/products/w/crop-jersey-tee-black-06-IMG_6595_2-480.webp 480w, https://strklvskyy11.github.io/exmptmind-content/products/w/crop-jersey-tee-black-06-IMG_6595_2-800.webp 800w, https://strklvskyy11.github.io/exmptmind-content/products/w/crop-jersey-tee-black-06-IMG_6595_2-1200.webp 1200w, https://strklvskyy11.github.io/exmptmind-content/products/w/crop-jersey-tee-black-06-IMG_6595_2-1600.webp 1600w, https://strklvskyy11.github.io/exmptmind-content/products/w/crop-jersey-tee-black-06-IMG_6595_2-2000.webp 2000w, https://strklvskyy11.github.io/exmptmind-content/products/w/crop-jersey-tee-black-06-IMG_6595_2-2560.webp 2560w" sizes="100vw" alt="" loading="lazy" decoding="async" style="background:url(data:image/webp;base64,UklGRpwAAABXRUJQVlA4IJAAAADQBACdASoYACAAPuVgpk2pJaOiMAwBIByJZQDH5BuZjgK1mTGLPlFwfzjhMof2AAD+0qAqAdgT+fqPauwzqL6GXuZLv8QR6hpa7XSWwGxbAFTBpXeVlL6Nb8HOS+0738m8tkeaEUmopIV5Yn/hP6FCZgm29MfR3ii8Am7NMuOAV2dmTa6hGNaIwtda7RIgAAA=) 50% 50%/cover"></figure>
+    </div>
+    <button class="pd-lb__close" type="button" aria-label="Close"><svg viewBox="0 0 24 24"><path d="M6 6l12 12M18 6L6 18"/></svg></button>
+    <div class="pd-lb__bar">
+      <p class="pd-lb__name">Crop Jersey Tee <span>4&nbsp;900&nbsp;&#8381;</span></p>
+      <div class="pd-lb__buy">
+        <button class="pd-lb__size" type="button">One Size</button>
+        <span class="pd-lb__select">select size</span>
+        <a class="pd-lb__btn" data-cart="add" href="https://exmptmind.com/shop-legacy#!/tproduct/1165615896-8198546817191">Add to Bag</a>
+        <a class="pd-lb__btn" data-cart="buy" href="https://exmptmind.com/shop-legacy#!/tproduct/1165615896-8198546817191">Buy Now</a>
+      </div>
+    </div>
+  </div>
+  <style>
+    .t706__carticon{display:none!important}
+    .pd .cb{position:fixed;inset:0;z-index:10002;visibility:hidden;pointer-events:none}
+    .pd .cb.is-open{visibility:visible;pointer-events:auto}
+    .pd .cb__bg{position:absolute;inset:0;background:rgba(0,0,0,.35);opacity:0;transition:opacity .35s ease}
+    .pd .cb.is-open .cb__bg{opacity:1}
+    .pd .cb__panel{position:absolute;top:10px;right:10px;bottom:10px;width:min(460px,calc(100% - 20px));display:flex;flex-direction:column;
+      background:#fff;border-radius:12px;overflow:hidden;transform:translateX(calc(100% + 24px));transition:transform .45s cubic-bezier(.2,.7,.2,1)}
+    .pd .cb.is-open .cb__panel{transform:none}
+    .pd .cb__head{flex:none;display:flex;justify-content:space-between;align-items:center;height:48px;padding:0 10px 0 18px;background:#E8E9EB}
+    .pd .cb__title{font-size:13px;font-weight:600}
+    .pd .cb__title i{font-style:normal;font-weight:400;color:var(--pd-grey);margin-left:6px}
+    .pd .cb__close{width:34px;height:34px;display:flex;align-items:center;justify-content:center}
+    .pd .cb__close svg{width:18px;height:18px;fill:none;stroke:currentColor;stroke-width:1.4}
+    .pd .cb__close:hover{color:var(--pd-blue)}
+    .pd .cb__body{flex:1;overflow-y:auto;padding:0 18px;overscroll-behavior:contain}
+    .pd .cb__item{display:grid;grid-template-columns:92px 1fr auto;gap:14px;padding:16px 0;border-bottom:1px solid var(--pd-line)}
+    .pd .cb__img{display:block;width:92px;aspect-ratio:3/4;background:var(--pd-media);overflow:hidden}
+    .pd .cb__img img{width:100%;height:100%;object-fit:cover}
+    .pd .cb__img.is-pack img{mix-blend-mode:multiply}
+    .pd .cb__name{font-size:13px;font-weight:600;line-height:1.25}
+    .pd .cb__name:hover{color:var(--pd-blue)}
+    .pd .cb__meta{margin-top:4px;font-size:12px;line-height:1.45;color:var(--pd-grey)}
+    .pd .cb__qty{display:flex;align-items:center;gap:4px;margin-top:12px}
+    .pd .cb__qty button{width:26px;height:26px;display:flex;align-items:center;justify-content:center;font-size:16px;line-height:1}
+    .pd .cb__qty button:hover{color:var(--pd-blue)}
+    .pd .cb__qty span{min-width:18px;text-align:center;font-size:13px}
+    .pd .cb__side{display:flex;flex-direction:column;justify-content:space-between;align-items:flex-end;text-align:right}
+    .pd .cb__price{font-size:13px;font-weight:500;white-space:nowrap}
+    .pd .cb__remove{font-size:12px;color:var(--pd-grey);display:flex;align-items:center;gap:5px}
+    .pd .cb__remove svg{width:10px;height:10px;fill:none;stroke:currentColor;stroke-width:1.6}
+    .pd .cb__remove:hover{color:var(--pd-blue)}
+    .pd .cb__empty{display:none;padding:56px 0 40px;text-align:center;font-size:14px}
+    .pd .cb__empty a{display:inline-block;margin-top:14px;font-size:13px;color:var(--pd-grey);border-bottom:1px solid currentColor}
+    .pd .cb__empty a:hover{color:var(--pd-blue)}
+    .pd .cb.is-empty .cb__empty{display:block}
+    .pd .cb.is-empty .cb__foot{display:none}
+    .pd .cb__up{padding:22px 0 18px}
+    .pd .cb__up h3{font-size:12px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;margin-bottom:14px}
+    .pd .cb__uplist{display:flex;gap:10px;overflow-x:auto;scrollbar-width:none;padding-bottom:4px}
+    .pd .cb__uplist::-webkit-scrollbar{display:none}
+    .pd .cb__card{flex:0 0 128px}
+    .pd .cb__card .cb__img{width:128px}
+    .pd .cb__card p{margin-top:8px;font-size:12px;line-height:1.3}
+    .pd .cb__card p b{display:block;font-weight:600}
+    .pd .cb__card p span{color:var(--pd-grey)}
+    .pd .cb__acts{display:flex;gap:5px;margin-top:8px}
+    .pd .cb__acts button{flex:1;height:30px;border-radius:999px;background:#E8E9EB;font-size:12px;font-weight:500}
+    .pd .cb__acts button:hover{background:var(--pd-blue);color:#fff}
+    .pd .cb__foot{flex:none;padding:14px 18px 18px;border-top:1px solid var(--pd-line)}
+    .pd .cb__sum{display:flex;justify-content:space-between;font-size:14px;font-weight:600;margin-bottom:12px}
+    .pd .cb__checkout{width:100%;height:50px;border-radius:8px;background:#000;color:#fff;font-size:14px;font-weight:500}
+    .pd .cb__checkout:hover{background:var(--pd-blue)}
+    .pd .cb__note{margin-top:10px;text-align:center;font-size:11px;color:var(--pd-grey)}
+    .pd-bag span:empty,.pd-mob__count:empty{display:none}
+    .pd-mob__count{position:absolute;top:-4px;right:-6px;min-width:15px;height:15px;padding:0 3px;border-radius:999px;background:#000;color:#fff;
+      font-size:9px;line-height:15px;text-align:center}
+    .pd-mob a[data-bag]{position:relative}
+    .t706 .t706__cartwin{background:rgba(0,0,0,.35)!important;overflow:hidden!important}
+    .t706 .t706__cartwin-content{position:fixed!important;top:10px!important;right:10px!important;bottom:10px!important;left:auto!important;
+      width:min(460px,calc(100% - 20px))!important;max-width:none!important;margin:0!important;padding:0 0 18px!important;border-radius:12px!important;
+      overflow-y:auto!important;background:#fff!important;box-sizing:border-box}
+    .t706 .t706__cartwin-content,.t706 .t706__cartwin-content *{font-family:var(--pd-font,'Golos Text'),Arial,sans-serif!important}
+    .t706 .t706__cartwin-top{position:sticky;top:0;z-index:2;display:flex;align-items:center;height:48px;margin:0!important;padding:0 52px 0 18px!important;
+      border:0!important;background:#E8E9EB}
+    .t706 .t706__cartwin-heading{font-size:13px!important;font-weight:600!important;line-height:1!important;padding:0!important}
+    .t706 .t706__cartwin-back{display:flex;align-items:center;gap:6px;margin-right:14px;padding:0;border:0;background:none;cursor:pointer;
+      font-size:13px;color:#8C8C8C}
+    .t706 .t706__cartwin-back:hover{color:#1C00FF}
+    .t706 .t706__cartwin-back svg{width:12px;height:12px;fill:none;stroke:currentColor;stroke-width:1.6}
+    .t706 .t706__cartwin-close{position:fixed!important;top:17px!important;right:22px!important;left:auto!important;z-index:5;width:34px;height:34px;
+      padding:0!important;display:flex;align-items:center;justify-content:center;background:none!important;border-radius:0!important}
+    .t706 .t706__cartwin-close-icon{width:14px!important;height:14px!important}
+    .t706 .t706__cartwin-close-icon rect{fill:#000!important}
+    .t706 .t706__cartwin-close:hover .t706__cartwin-close-icon rect{fill:#1C00FF!important}
+    .t706 .t706__cartwin-products{display:block!important;width:auto!important;box-sizing:border-box!important;padding:6px 18px 0!important;margin:0!important}
+    .t706 .t706__product{display:flex!important;align-items:flex-start;gap:12px;width:auto!important;height:auto!important;box-sizing:border-box;padding:12px 0!important;border-top:0!important;border-bottom:1px solid #D9D9D9!important}
+    .t706 .t706__product-thumb{width:56px!important;min-width:56px;padding:0!important}
+    .t706 .t706__product-imgdiv{width:56px!important;height:74px!important;background-color:#F2F2F2!important;background-size:cover!important;border-radius:0!important}
+    .t706 .t706__product-title{flex:1;min-width:0;padding:0!important;font-size:13px!important;font-weight:600!important;line-height:1.3!important}
+    .t706 .t706__product-title a{color:#000!important}
+    .t706 .t706__product-title__option{margin-top:2px;font-size:12px!important;font-weight:400!important;color:#8C8C8C!important;opacity:1!important}
+    .t706 .t706__product-plusminus,.t706 .t706__product-del-wrapper{display:none!important}
+    .t706 .t706__product-amount{display:flex;gap:2px;padding:0!important;font-size:13px!important;font-weight:500!important;white-space:nowrap}
+    .t706 .t706__cartwin-bottom{padding:14px 18px 0!important;margin:0!important;border:0!important}
+    .t706 .t706__cartwin-prodamount-wrap{display:flex!important;justify-content:space-between;font-size:13px!important;color:#8C8C8C}
+    .t706 .t706__cartwin-prodamount-wrap *{font-weight:400!important}
+    .t706 .t706__orderform{padding:10px 18px 0!important;margin:0!important}
+    .t706 .t-input-group{margin-bottom:14px!important}
+    .t706 .t-input-title{padding-bottom:6px!important;font-size:12px!important;font-weight:400!important;color:#8C8C8C!important}
+    .t706 .t-input{height:46px!important;border:1px solid #D9D9D9!important;border-radius:0!important;background:#fff!important;box-shadow:none!important;
+      font-size:14px!important;color:#000!important}
+    .t706 .t-input:focus,.t706 .t-input-phonemask__wrap:focus-within{border-color:#000!important}
+    .t706 .t-input-phonemask__wrap{display:flex;align-items:center;padding-left:12px!important}
+    .t706 .t-input-phonemask__wrap .t-input{height:44px!important;border:0!important}
+    .t706 .t706__cartwin-totalamount-wrap{margin:18px 0 12px!important;padding:14px 0 0!important;border-top:1px solid #D9D9D9!important}
+    .t706 .t706__cartwin-totalamount-row{display:flex;justify-content:space-between}
+    .t706 .t706__cartwin-totalamount-row,.t706 .t706__cartwin-totalamount-row *{font-size:14px!important;font-weight:600!important}
+    .t706 .t-form__submit{padding:0!important;margin:0!important}
+    .t706 .t-submit{width:100%!important;height:50px!important;border:0!important;border-radius:8px!important;background:#000!important;color:#fff!important;
+      font-size:14px!important;font-weight:500!important}
+    .t706 .t-submit:hover{background:#1C00FF!important}
+    .t706 .t-form__errorbox-middle,.t706 .js-errorbox-all,.t706 .t-form__errorbox-wrapper{background:none!important}
+    .t706 .t-form__errorbox-wrapper{padding:0!important;margin:0 0 10px!important}
+    .t706 .t-form__errorbox-text,.t706 .t-form__errorbox-item{color:#e5484d!important;font-size:12px!important;text-align:left!important}
+    .t706 .t-input-error{color:#e5484d!important;font-size:11px!important}
+    .t706 .t-form__successbox{border-radius:0!important;background:#F2F2F2!important;color:#000!important;font-size:14px!important;text-align:left!important}
+    @media (max-width:820px){
+      .t706 .t706__cartwin-content{top:8px!important;right:8px!important;bottom:8px!important;width:calc(100% - 16px)!important}
+      .t706 .t706__cartwin-close{top:15px!important;right:18px!important}
+      .pd .cb__panel{top:8px;right:8px;bottom:8px;width:calc(100% - 16px)}
+      .pd .cb__item{grid-template-columns:80px 1fr auto}
+      .pd .cb__img{width:80px}
+    }
+  </style>
+  <div class="cb" role="dialog" aria-label="Bag">
+    <div class="cb__bg"></div>
+    <aside class="cb__panel">
+      <div class="cb__head">
+        <span class="cb__title">bag<i class="cb__count"></i></span>
+        <button class="cb__close" type="button" aria-label="Close"><svg viewBox="0 0 24 24"><path d="M6 6l12 12M18 6L6 18"/></svg></button>
+      </div>
+      <div class="cb__body">
+        <div class="cb__items"></div>
+        <div class="cb__empty">your bag is empty<br><a href="/shop">continue shopping</a></div>
+        <section class="cb__up"><h3>complete the fit</h3><div class="cb__uplist"></div></section>
+      </div>
+      <div class="cb__foot">
+        <div class="cb__sum"><span>subtotal</span><span class="cb__total"></span></div>
+        <button class="cb__checkout" type="button">checkout</button>
+        <p class="cb__note">shipping and payment on the next step</p>
+      </div>
+    </aside>
+  </div>
+  <script>
+  (function () {
+    var C = {"recid": "1165615896", "current": "8198546817191", "catalog": [{"lid": "1790151422344", "name": "Realtree Balloons", "cname": "Realtree Baloons", "color": "Light Khaki Camo", "price": 14700, "img": "https://strklvskyy11.github.io/exmptmind-content/products/w/realtree-balloons-pack-front-480.webp", "pack": true, "sizes": ["One Size"], "url": "/shop/realtree-balloons"}, {"lid": "8188546817190", "name": "OG Cargo Pants", "cname": "OG Cargo Pants", "color": "Hiker Moss", "price": 12900, "img": "https://strklvskyy11.github.io/exmptmind-content/products/w/og-cargo-pants-hiker-moss-01-13-480.webp", "pack": false, "sizes": ["M", "L"], "url": "/shop/og-cargo-pants-hiker-moss"}, {"lid": "1753015816827", "name": "OG Cargo Pants", "cname": "OG Cargo Pants", "color": "Utility Black", "price": 12900, "img": "https://strklvskyy11.github.io/exmptmind-content/products/w/og-cargo-pants-utility-black-01-32-480.webp", "pack": false, "sizes": ["M", "L"], "url": "/shop/og-cargo-pants-utility-black"}, {"lid": "8198546817191", "name": "Crop Jersey Tee", "cname": "Crop Jersey T-Shirt", "color": "Black", "price": 4900, "img": "https://strklvskyy11.github.io/exmptmind-content/products/w/crop-jersey-tee-black-01-IMG_5872-480.webp", "pack": false, "sizes": ["One Size"], "url": "/shop/crop-jersey-tee-black"}, {"lid": "1753216551793", "name": "Crop Jersey Tee", "cname": "Crop Jersey T-Shirt", "color": "White", "price": 4900, "img": "https://strklvskyy11.github.io/exmptmind-content/products/w/crop-jersey-tee-white-01-IMG_5864-480.webp", "pack": false, "sizes": ["One Size"], "url": "/shop/crop-jersey-tee-white"}], "t": {"remove": "remove", "add": "add", "option": "Size", "checkout": "checkout", "back": "bag", "subtotal": "subtotal", "total": "total"}};
+    var root = document.querySelector('.cb'); if (!root) return;
+    var X = '<svg viewBox="0 0 24 24"><path d="M6 6l12 12M18 6L6 18"/></svg>';
+    function ready() { return !!(window.tcart && typeof window.tcart__addProduct === 'function'); }
+    function list() {
+      if (window.tcart && window.tcart.products) return window.tcart.products;
+      try { return (JSON.parse(localStorage.getItem('tcart')) || {}).products || []; } catch (e) { return []; }
+    }
+    function alive(p) { return p && p.deleted !== 'yes' && parseInt(p.quantity, 10) > 0; }
+    function money(n) { return String(Math.round(n)).replace(/\B(?=(\d{3})+(?!\d))/g, '\u00a0') + '\u00a0\u20bd'; }
+    function esc(s) { return String(s == null ? '' : s).replace(/[&<>"]/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]; }); }
+    function count() { return list().filter(alive).reduce(function (n, p) { return n + parseInt(p.quantity, 10); }, 0); }
+    function total() { return list().filter(alive).reduce(function (s, p) { return s + (parseFloat(p.amount) || p.price * p.quantity); }, 0); }
+    function info(lid) { for (var i = 0; i < C.catalog.length; i++) if (C.catalog[i].lid === String(lid)) return C.catalog[i]; return null; }
+    function commit() {
+      try { tcart__updateTotalProductsinCartObj(); tcart__saveLocalObj(); } catch (e) {}
+      try { window.tcart__reDrawCartIcon && tcart__reDrawCartIcon(); window.tcart__reDrawProducts && tcart__reDrawProducts(); } catch (e) {}
+    }
+    function badge() {
+      var n = count();
+      document.querySelectorAll('[data-bag-count]').forEach(function (el) {
+        el.textContent = n ? (el.getAttribute('data-bag-count') === 'dash' ? ' \u2014 ' + n : n) : '';
+      });
+    }
+    function render() {
+      var items = list(), html = '', inCart = {};
+      items.forEach(function (p, i) {
+        if (!alive(p)) return;
+        inCart[p.lid] = 1;
+        var c = info(p.lid), size = '';
+        (p.options || []).forEach(function (o) { if (o && o.variant) size = o.variant; });
+        var url = c ? c.url : (p.url || '#');
+        html += '<div class="cb__item" data-i="' + i + '">' +
+          '<a class="cb__img' + (c && c.pack ? ' is-pack' : '') + '" href="' + esc(url) + '"><img src="' + esc(p.img || (c && c.img) || '') + '" alt=""></a>' +
+          '<div><a class="cb__name" href="' + esc(url) + '">' + esc(c ? c.name : p.name) + '</a>' +
+          '<div class="cb__meta">' + esc(c ? c.color : (p.sku || '')) + (size ? '<br>' + esc(size) : '') + '</div>' +
+          '<div class="cb__qty"><button type="button" data-q="-1" aria-label="-">\u2212</button><span>' + p.quantity + '</span><button type="button" data-q="1" aria-label="+">+</button></div></div>' +
+          '<div class="cb__side"><span class="cb__price">' + money(parseFloat(p.amount) || p.price * p.quantity) + '</span>' +
+          '<button class="cb__remove" type="button" data-q="0">' + X + C.t.remove + '</button></div></div>';
+      });
+      root.querySelector('.cb__items').innerHTML = html;
+      var up = '';
+      C.catalog.forEach(function (c) {
+        if (inCart[c.lid] || c.lid === C.current) return;
+        var acts = c.sizes.map(function (s) {
+          return '<button type="button" data-add="' + c.lid + '" data-size="' + esc(s) + '">' + esc(c.sizes.length > 1 ? s : C.t.add) + '</button>';
+        }).join('');
+        up += '<div class="cb__card"><a class="cb__img' + (c.pack ? ' is-pack' : '') + '" href="' + c.url + '"><img src="' + c.img + '" alt="" loading="lazy"></a>' +
+          '<p><b>' + esc(c.name) + '</b><span>' + esc(c.color) + '</span><br>' + money(c.price) + '</p><div class="cb__acts">' + acts + '</div></div>';
+      });
+      root.querySelector('.cb__uplist').innerHTML = up;
+      root.querySelector('.cb__up').style.display = up ? '' : 'none';
+      var n = count();
+      root.querySelector('.cb__count').textContent = n ? '(' + n + ')' : '';
+      root.querySelector('.cb__total').textContent = money(total());
+      root.classList.toggle('is-empty', !n);
+      badge();
+    }
+    function open() {
+      if (window.tcart__syncProductsObject__LStoObj) try { tcart__syncProductsObject__LStoObj(); } catch (e) {}
+      render(); root.classList.add('is-open'); document.documentElement.style.overflow = 'hidden';
+    }
+    function close() { root.classList.remove('is-open'); document.documentElement.style.overflow = ''; }
+    function add(lid, size) {
+      var c = info(lid); if (!c || !ready()) return false;
+      var el = document.querySelector('.t706'), was = el && el.getAttribute('data-opencart-onorder'), bubble = window.tcart__showBubble;
+      if (el) el.setAttribute('data-opencart-onorder', 'no');
+      window.tcart__showBubble = function () {};
+      try {
+        tcart__addProduct({ name: c.cname || c.name, price: c.price, img: c.img, recid: C.recid, lid: c.lid, sku: c.color,
+          options: [{ option: C.t.option, variant: size || c.sizes[0] }], url: location.origin + c.url });
+      } finally {
+        window.tcart__showBubble = bubble;
+        if (el && was !== null) el.setAttribute('data-opencart-onorder', was);
+      }
+      return true;
+    }
+    function checkout() {
+      close(); tcart__openCart();
+      var win = document.querySelector('.t706__cartwin'); if (!win) return;
+      var h = win.querySelector('.t706__cartwin-heading'); if (h) h.textContent = C.t.checkout;
+      var top = win.querySelector('.t706__cartwin-top');
+      if (top && !top.querySelector('.t706__cartwin-back')) {
+        var b = document.createElement('button'); b.type = 'button'; b.className = 't706__cartwin-back';
+        b.innerHTML = '<svg viewBox="0 0 12 12"><path d="M8 1L3 6l5 5"/></svg>' + C.t.back;
+        b.addEventListener('click', function () { tcart__closeCart(); setTimeout(open, 50); });
+        top.insertBefore(b, top.firstChild);
+      }
+      function labels() {
+        var a = win.querySelector('.t706__cartwin-prodamount-label'); if (a) a.textContent = C.t.subtotal;
+        var t = win.querySelector('.t706__cartwin-totalamount-row_total .t706__cartwin-totalamount-label, .t706__cartwin-totalamount-row_total > div:first-child');
+        if (t && !t.querySelector('*')) t.textContent = C.t.total;
+      }
+      labels(); setTimeout(labels, 400);
+    }
+    function chosenSize(btn) {
+      var lb = btn.closest('.pd-lb'), a = (lb || document).querySelector(lb ? '.pd-lb__size.is-active' : '.pd-sizes .pd-size.is-active');
+      return a ? a.textContent.trim() : '';
+    }
+    document.addEventListener('click', function (e) {
+      var bag = e.target.closest('[data-bag]');
+      if (bag) { e.preventDefault(); open(); return; }
+      var btn = e.target.closest('[data-cart]');
+      if (btn) {
+        if (!ready()) return;
+        var info_ = document.querySelector('.pd-info');
+        if (info_ && info_.classList.contains('needs-size')) return;
+        e.preventDefault();
+        if (!add(C.current, chosenSize(btn))) return;
+        var lbClose = document.querySelector('.pd-lb.is-open .pd-lb__close'); if (lbClose) lbClose.click();
+        if (btn.getAttribute('data-cart') === 'buy') { commit(); checkout(); } else { commit(); open(); }
+        return;
+      }
+      if (!root.contains(e.target)) return;
+      var row = e.target.closest('.cb__item'), q = e.target.closest('[data-q]');
+      if (row && q) {
+        var p = window.tcart.products[+row.getAttribute('data-i')], d = +q.getAttribute('data-q');
+        if (!p) return;
+        if (d === 0 || p.quantity + d <= 0) window.tcart.products.splice(+row.getAttribute('data-i'), 1);
+        else if (!(d > 0 && p.inv > 0 && p.quantity >= p.inv)) { p.quantity += d; p.amount = Math.round(p.price * p.quantity * 100) / 100; }
+        commit(); render(); return;
+      }
+      var u = e.target.closest('[data-add]');
+      if (u) { if (add(u.getAttribute('data-add'), u.getAttribute('data-size'))) { commit(); render(); } return; }
+      if (e.target.closest('.cb__close') || e.target.classList.contains('cb__bg')) { close(); return; }
+      if (e.target.closest('.cb__checkout')) { checkout(); }
+    });
+    document.addEventListener('keydown', function (e) { if (e.key === 'Escape' && root.classList.contains('is-open')) close(); });
+    badge(); var tries = 0, t = setInterval(function () { badge(); if (ready() || ++tries > 20) clearInterval(t); }, 300);
+  })();
+  </script>
+<script>
+(function () {
+  document.addEventListener('error', function (e) {
+    var i = e.target; if (!i || i.tagName !== 'IMG' || i.getAttribute('data-retry') || !/github\.io|jsdelivr/.test(i.currentSrc || i.src)) return;
+    i.setAttribute('data-retry', '1');
+    setTimeout(function () { if (i.srcset) i.srcset = i.srcset.replace(/\.webp(?=[ ,]|$)/g, '.webp?r=1'); i.src = i.src + '?r=1'; }, 800);
+  }, true);
+})();
+(function () {
+  var c = navigator.connection; if (c && (c.saveData || /2g/.test(c.effectiveType || ''))) return;
+  function go() {
+    var list = [].filter.call(document.querySelectorAll('.pd img[loading="lazy"]'), function (i) { return i.getClientRects().length && !i.closest('.pd-lb'); }), k = 0;
+    (function next() { for (var n = 0; n < 3 && k < list.length; n++, k++) list[k].loading = 'eager'; if (k < list.length) setTimeout(next, 150); })();
+  }
+  function start() { setTimeout(go, 300); }
+  if (document.readyState === 'complete') start(); else addEventListener('load', start);
+})();
+</script>
+</div>
+<script>
+(function () {
+  var items = document.querySelectorAll('.pd-announce span'); if (items.length < 2) return;
+  var i = 0;
+  setInterval(function () {
+    items[i].classList.remove('is-on'); i = (i + 1) % items.length; items[i].classList.add('is-on');
+  }, 4000);
+})();
+(function () {
+  var h = document.querySelector('.pd-header'), m = document.querySelector('.pd-main');
+  if (!h || !m) return;
+  function check() {
+    var away = m.getBoundingClientRect().bottom < h.getBoundingClientRect().height + 16;
+    if (h.classList.contains('is-menu')) away = false;
+    h.classList.toggle('is-away', away);
+  }
+  var ticking = false;
+  window.addEventListener('scroll', function () { if (!ticking) { ticking = true; requestAnimationFrame(function () { ticking = false; check(); }); } }, { passive: true });
+  window.addEventListener('resize', check);
+  check();
+})();
+(function () {
+  var head = document.querySelector('.pd-header'), pill = head && head.querySelector('.pd-pill'); if (!pill) return;
+  var edge = document.querySelector('.pd-gallery'), clear = null, ticking = false;
+  function update() {
+    ticking = false;
+    var c = edge ? edge.getBoundingClientRect().top <= head.offsetTop + pill.offsetTop : (window.scrollY || window.pageYOffset) > 40;
+    if (c !== clear) { clear = c; head.classList.toggle('is-clear', c); }
+  }
+  addEventListener('scroll', function () { if (!ticking) { ticking = true; requestAnimationFrame(update); } }, { passive: true });
+  addEventListener('resize', update); update();
+})();
+(function () {
+  var h = document.querySelector('.pd-header'), b = document.querySelector('.pd-burger');
+  if (!h || !b) return;
+  b.addEventListener('click', function () { h.classList.toggle('is-menu'); });
+})();
+(function () {
+  var btns = document.querySelectorAll('.pd-acc__btn');
+  btns.forEach(function (b) {
+    b.addEventListener('click', function () {
+      var open = !b.classList.contains('is-open');
+      btns.forEach(function (x) { x.classList.remove('is-open'); });
+      document.querySelectorAll('.pd-panel').forEach(function (p) { p.classList.remove('is-open'); });
+      if (open) {
+        b.classList.add('is-open');
+        document.querySelector('.pd-panel[data-panel="' + b.getAttribute('data-tab') + '"]').classList.add('is-open');
+      }
+    });
+  });
+})();
+(function () {
+  var lb = document.querySelector('.pd-lb'), g = document.querySelector('.pd-gallery');
+  if (!lb || !g) return;
+  var stage = lb.querySelector('.pd-lb__stage'), slides = stage.querySelectorAll('figure'),
+      thumbs = lb.querySelectorAll('.pd-lb__thumbs button');
+  function setActive() {
+    var mid = stage.scrollTop + stage.clientHeight / 3, a = 0;
+    slides.forEach(function (f, i) { if (f.offsetTop <= mid) a = i; });
+    thumbs.forEach(function (t, i) { t.classList.toggle('is-active', i === a); });
+  }
+  function open(i) {
+    lb.classList.add('is-open'); document.documentElement.style.overflow = 'hidden';
+    stage.scrollTop = slides[i].offsetTop; setActive();
+  }
+  function close() { lb.classList.remove('is-open', 'is-sized'); lb.querySelectorAll('.pd-lb__size').forEach(function (b) { b.classList.remove('is-active'); }); document.documentElement.style.overflow = ''; }
+  g.querySelectorAll('figure').forEach(function (f, i) {
+    f.addEventListener('click', function () { if (g.dataset.dragged) { g.dataset.dragged = ''; return; } open(i); });
+  });
+  thumbs.forEach(function (t, i) { t.addEventListener('click', function () { stage.scrollTo({ top: slides[i].offsetTop, behavior: 'smooth' }); }); });
+  stage.addEventListener('scroll', setActive, { passive: true });
+  lb.querySelector('.pd-lb__close').addEventListener('click', close);
+  document.addEventListener('keydown', function (e) { if (e.key === 'Escape' && lb.classList.contains('is-open')) close(); });
+})();
+(function () {
+  var z = document.querySelector('.pd-zoom'), open = document.querySelector('.pd-chart');
+  if (!z || !open) return;
+  function close() { z.classList.remove('is-open'); document.documentElement.style.overflow = ''; }
+  open.addEventListener('click', function () { z.classList.add('is-open'); document.documentElement.style.overflow = 'hidden'; });
+  z.querySelector('.pd-zoom__close').addEventListener('click', close);
+  z.querySelector('.pd-zoom__bg').addEventListener('click', close);
+  document.addEventListener('keydown', function (e) { if (e.key === 'Escape') close(); });
+})();
+(function () {
+  var info = document.querySelector('.pd-info'), lb = document.querySelector('.pd-lb'), bar = document.querySelector('.pd-mbar');
+  var main = document.querySelectorAll('.pd-sizes .pd-size'), view = lb ? lb.querySelectorAll('.pd-lb__size') : [];
+  function mark(list, i) { list.forEach(function (b, k) { b.classList.toggle('is-active', k === i); }); }
+  main.forEach(function (b, i) { b.addEventListener('click', function () { mark(main, i); info.classList.remove('needs-size'); }); });
+  view.forEach(function (b, i) { b.addEventListener('click', function () { mark(view, i); lb.classList.add('is-sized'); mark(main, i); info.classList.remove('needs-size'); }); });
+  if (bar) bar.addEventListener('click', function (e) {
+    if (info.classList.contains('needs-size')) { e.preventDefault(); document.querySelector('.pd-sizes').scrollIntoView({ behavior: 'smooth', block: 'center' }); }
+  });
+})();
+(function () {
+  var g = document.querySelector('.pd-gallery'); if (!g) return;
+  var wrap = g.parentNode, figs = g.querySelectorAll('figure'), num = wrap.querySelector('.pd-gcount b');
+  wrap.querySelector('.pd-gcount i').textContent = figs.length;
+  function step() { return figs[0].getBoundingClientRect().width + 3; }
+  g.addEventListener('scroll', function () { num.textContent = Math.min(figs.length, Math.round(g.scrollLeft / step()) + 1); }, { passive: true });
+  var down = false, x0 = 0, s0 = 0;
+  g.addEventListener('pointerdown', function (e) {
+    if (e.pointerType !== 'mouse' || g.scrollWidth <= g.clientWidth) return;
+    down = true; x0 = e.clientX; s0 = g.scrollLeft; g.classList.add('is-drag'); g.dataset.dragged = '';
+  });
+  window.addEventListener('pointermove', function (e) { if (down) { g.scrollLeft = s0 - (e.clientX - x0); if (Math.abs(e.clientX - x0) > 6) g.dataset.dragged = '1'; } });
+  window.addEventListener('pointerup', function () {
+    if (!down) return; down = false; g.classList.remove('is-drag');
+    var d = g.scrollLeft - s0, i = Math.round(s0 / step()) + (d > 40 ? 1 : d < -40 ? -1 : 0);
+    g.scrollTo({ left: Math.max(0, i) * step(), behavior: 'smooth' });
+  });
+})();
+</script>
