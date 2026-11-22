@@ -1,0 +1,809 @@
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Golos+Text:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --pd-ink:#000;
+    --pd-grey:#8C8C8C;
+    --pd-line:#D9D9D9;
+    --pd-media:#F2F2F2;
+    --pd-blue:#1C00FF;
+    --pd-font:'Golos Text','Helvetica Neue',Arial,sans-serif;
+  }
+  body{background:#fff}
+  .pd,.pd *{box-sizing:border-box;margin:0;padding:0}
+  .pd{font-family:var(--pd-font);color:var(--pd-ink);background:#fff;font-size:14px;line-height:1.2;letter-spacing:-.005em;
+    -webkit-font-smoothing:antialiased;-moz-osx-font-smoothing:grayscale}
+  .pd a{color:inherit;text-decoration:none}
+  .pd button{font:inherit;color:inherit;background:none;border:0;cursor:pointer;letter-spacing:inherit}
+  .pd button:focus{outline:none}
+  .pd a:focus,.pd button:focus-visible{outline:none}
+  .pd img{display:block;width:100%;height:100%;object-fit:cover}
+  .pd-logo{display:block;height:17px}
+  .pd-logo img{height:100%;width:auto;object-fit:contain}
+  .pd-header{position:fixed;top:16px;left:16px;right:16px;z-index:9990;transition:opacity .45s ease,transform .45s ease}
+  .pd-header.is-away{opacity:0;transform:translateY(-12px);pointer-events:none}
+  .pd-announce{position:relative;height:30px;overflow:hidden;border-radius:8px 8px 0 0;
+    background:rgba(242,242,242,.75);-webkit-backdrop-filter:blur(2px);backdrop-filter:blur(2px);
+    font-size:11px;font-weight:500;letter-spacing:.01em}
+  .pd-announce span{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;opacity:0;transition:opacity .4s}
+  .pd-announce span.is-on{opacity:1}
+  .pd-pill{position:relative;height:38px;display:grid;grid-template-columns:1fr auto 1fr;align-items:center;padding:0 12px;
+    border-radius:0 0 8px 8px;background:#fff}
+  .pd-nav{display:flex;align-items:center;gap:28px;font-size:13px;font-weight:500}
+  .pd-nav--r{justify-content:flex-end}
+  .pd-nav a:hover{color:var(--pd-blue)}
+  .pd-mob{display:none}
+  .pd-menu{display:none}
+  .hm-btn{display:inline-flex;align-items:center;justify-content:center;height:38px;padding:0 18px;border-radius:999px;
+    font-size:13px;font-weight:500;white-space:nowrap;transition:background .25s,color .25s,border-color .25s}
+  .pd .hm-btn--w{background:#fff;color:#000}
+  .pd .hm-btn--o{border:1px solid rgba(255,255,255,.7);color:#fff}
+  .pd .hm-btn--k{background:#000;color:#fff}
+  .pd .hm-btn:hover{background:var(--pd-blue);border-color:var(--pd-blue);color:#fff}
+  .hm-link{font-size:13px;font-weight:500;white-space:nowrap;border-bottom:1px solid currentColor;padding-bottom:1px}
+  .hm-link:hover{color:var(--pd-blue)}
+  .hm-hero{position:sticky;top:0;height:100vh;height:100svh;min-height:560px;overflow:hidden;background:#3c4a5c;color:#fff}
+  .hm-hero__media,.hm-hero picture{position:absolute;inset:0}
+  .hm-hero img{object-position:50% 50%}
+  .hm-slides{position:absolute;inset:0}
+  .hm-slides--m{display:none}
+  .hm-slide{position:absolute;inset:0;opacity:0;visibility:hidden}
+  .hm-slide.is-on{opacity:1;visibility:visible}
+  .hm-slide.is-top{z-index:1;transition:opacity 1.4s ease}
+  .hm-hero::after{content:"";position:absolute;inset:0;pointer-events:none;background:rgba(0,0,0,.12)}
+  .hm-hero__shade{position:absolute;inset:0;z-index:1;background:#000;opacity:0;pointer-events:none;will-change:opacity}
+  .hm-hero__in{position:absolute;left:42px;bottom:56px;z-index:2;display:flex;flex-direction:column;align-items:flex-start;gap:22px;
+    text-shadow:0 1px 14px rgba(0,0,0,.2);will-change:transform,opacity}
+  .hm-hero h1{font-size:clamp(28px,2.3vw,40px);font-weight:600;letter-spacing:-.02em;line-height:1}
+  .hm-hero__sub{margin-top:4px;font-size:clamp(16px,1.3vw,22px);font-weight:600;letter-spacing:-.01em}
+  .pd .hm-hero__btn{display:flex;align-items:center;justify-content:center;width:clamp(200px,15vw,260px);height:46px;
+    border:1.5px solid rgba(255,255,255,.85);background:rgba(255,255,255,.1);-webkit-backdrop-filter:blur(6px);backdrop-filter:blur(6px);
+    color:#fff;font-size:15px;font-weight:500;text-shadow:none;transition:background .25s,border-color .25s}
+  .pd .hm-hero__btn:hover{background:var(--pd-blue);border-color:var(--pd-blue)}
+  .hm-ph{position:absolute;inset:0;overflow:hidden;background:linear-gradient(180deg,#1a2640 0%,#131c30 100%)}
+  .hm-ph::after{content:"";position:absolute;inset:0;opacity:.12;mix-blend-mode:overlay;pointer-events:none;
+    background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E")}
+  .hm-ph span{position:absolute;right:10px;top:10px;z-index:1;font-size:10px;font-weight:500;letter-spacing:.06em;color:rgba(255,255,255,.32)}
+  .hm-hero .hm-ph span{top:84px;right:24px}
+  .hm-card__media .hm-ph.alt{opacity:0}
+  .hm-mob{display:none}
+  .hm-desk{display:block;width:100%;height:100%}
+  .hm-sheet{position:relative;z-index:2;margin-top:-24px;background:#fff;border-radius:24px 24px 0 0;padding:0 0 1px;
+    box-shadow:0 -20px 50px rgba(0,0,0,.12)}
+  .hm-band{position:relative;height:90vh;min-height:520px;margin-top:64px;overflow:hidden;background:#131c30}
+  .hm-story__head{position:relative;display:grid;grid-template-columns:120px 1fr auto;gap:24px;align-items:baseline;padding:20px 24px}
+  .hm-story__head--first::before{content:"";position:absolute;left:50%;top:50%;width:36px;height:4px;margin:-2px 0 0 -18px;border-radius:2px;background:var(--pd-line)}
+  .hm-story__no{font-size:13px;font-weight:500;color:var(--pd-grey)}
+  .hm-story__head h3{font-size:22px;font-weight:600;letter-spacing:-.03em;line-height:1}
+  .hm-story__head p{max-width:520px;font-size:14px;line-height:1.42;color:#333}
+  .hm-story__media{position:relative;display:grid;grid-template-columns:1fr 1fr;gap:5px;height:92vh;min-height:520px;padding:0 5px}
+  .hm-story__media figure{position:relative;overflow:hidden;background:var(--pd-media)}
+  .hm-story__media img{opacity:0;transition:opacity 1s ease}
+  .hm-story.is-in .hm-story__media img{opacity:1}
+  .hm-story__cap{position:absolute;left:21px;bottom:18px;z-index:2;color:#fff;font-size:12px;font-weight:500;text-shadow:0 1px 10px rgba(0,0,0,.25)}
+  .hm-row{display:grid;grid-template-columns:repeat(4,1fr);gap:5px;padding:5px 5px 0}
+  .hm-card__media{position:relative;aspect-ratio:3/4;background:var(--pd-media);overflow:hidden}
+  .hm-card__media img{position:absolute;inset:0}
+  .hm-card.is-pack .hm-card__media img{mix-blend-mode:multiply}
+  .hm-card__media img.alt{display:none}
+  .hm-card__media img{transition:transform 1.2s cubic-bezier(.2,.7,.2,1)}
+  @media (hover:hover){.hm-card:hover .hm-card__media img{transform:scale(1.04)}}
+  .hm-card__tag{position:absolute;left:8px;top:8px;z-index:2;font-size:12px;color:var(--pd-grey)}
+  .hm-card__info{display:flex;justify-content:space-between;gap:12px;padding:10px 8px 0;font-size:13px}
+  .hm-card__info b{font-weight:600;margin-right:10px}
+  .hm-card__info span{color:var(--pd-grey)}
+  .hm-card__info p:last-child{white-space:nowrap}
+  .hm-card:hover .hm-card__info b{color:var(--pd-blue)}
+  .hm-card--look .hm-card__info span{color:var(--pd-grey)}
+  .hm-pano{position:relative;height:100vh;min-height:560px;margin:0 5px 120px;overflow:hidden;color:#fff;border-radius:2px}
+  .hm-pano__media{position:absolute;inset:-8% 0;will-change:transform}
+  .hm-pano__media img{object-position:50% 40%}
+  .hm-pano::after{content:"";position:absolute;inset:0;background:linear-gradient(to top,rgba(0,0,0,.5),rgba(0,0,0,0) 50%);pointer-events:none}
+  .hm-pano__txt{position:absolute;left:20px;right:20px;bottom:28px;z-index:2;display:flex;justify-content:space-between;align-items:flex-end;gap:40px}
+  .hm-pano__txt h2{font-size:clamp(48px,7.6vw,124px);font-weight:600;letter-spacing:-.055em;line-height:.84}
+  .hm-pano__txt div{max-width:320px}
+  .hm-pano__txt p{font-size:14px;line-height:1.4;margin-bottom:16px}
+  .hm-tiles{display:grid;grid-template-columns:1fr 1fr;gap:5px;padding:64px 5px 0}
+  .pd .hm-tile{position:relative;display:block;height:78vh;min-height:460px;overflow:hidden;background:var(--pd-media);color:#fff}
+  .hm-tile img{transition:transform 1.2s cubic-bezier(.2,.7,.2,1)}
+  .hm-tile:hover img{transform:scale(1.03)}
+  .hm-tile::after{content:"";position:absolute;inset:0;background:linear-gradient(to top,rgba(0,0,0,.4),rgba(0,0,0,0) 45%)}
+  .hm-tile__txt{position:absolute;left:20px;right:20px;bottom:20px;z-index:2;display:flex;justify-content:space-between;align-items:flex-end;gap:20px}
+  .hm-tile__txt b{display:block;font-size:clamp(30px,3.4vw,52px);font-weight:600;letter-spacing:-.045em;line-height:.9}
+  .hm-tile__txt span{display:block;margin-top:10px;max-width:300px;font-size:13px;line-height:1.35}
+  .hm-tile__txt i{font-style:normal;font-size:13px;font-weight:500;border-bottom:1px solid currentColor;white-space:nowrap}
+  .hm-tile:hover .hm-tile__txt i{color:#fff;border-color:var(--pd-blue);background:var(--pd-blue)}
+  .hm-rv{opacity:0;transform:translateY(26px);transition:opacity .9s ease,transform .9s cubic-bezier(.2,.7,.2,1)}
+  .hm-rv.is-in{opacity:1;transform:none}
+  .pd-foot{display:grid;grid-template-columns:1fr auto 1fr;align-items:center;height:40px;margin:40px 16px 16px;padding:0 16px;
+    border-radius:999px;background:#E8E9EB;font-size:12px;font-weight:500}
+  .pd-foot__logo{display:block;height:13px}
+  .pd-foot__logo img{height:100%;width:auto;object-fit:contain}
+  .pd-foot__r{display:flex;justify-content:flex-end;align-items:center;gap:22px}
+  .pd-foot__lang{display:flex;gap:3px;color:var(--pd-grey)}
+  .pd-foot__lang a{color:var(--pd-ink)}
+  .pd-foot a:hover{color:var(--pd-blue)}
+  @media (min-width:821px) and (hover:hover){
+    .pd-announce{transition:opacity .35s ease}
+    .pd-pill{transition:background-color .35s ease}
+    .pd-header.is-clear .pd-announce{opacity:0}
+    .pd-header.is-clear .pd-pill{background-color:transparent}
+    .pd-header.is-clear:hover .pd-announce,.pd-header.is-clear:focus-within .pd-announce{opacity:1}
+    .pd-header.is-clear:hover .pd-pill,.pd-header.is-clear:focus-within .pd-pill{background-color:#fff}
+  }
+  @media (max-width:820px){
+    .pd-header{top:8px;left:10px;right:10px}
+    .pd-announce{height:26px;font-size:10px}
+    .pd-pill{height:40px;display:flex;justify-content:space-between;padding:0 12px}
+    .pd-nav{display:none}
+    .pd-logo{height:15px}
+    .pd-logo img{margin-left:-23px}
+    .pd-mob{display:flex;align-items:center;gap:16px}
+    .pd-mob a,.pd .pd-mob button{display:flex;width:22px;height:22px;align-items:center;justify-content:center}
+    .pd-mob svg{width:20px;height:20px;fill:none;stroke:currentColor;stroke-width:1.5}
+    .pd-mob a:hover,.pd .pd-mob button:hover{color:var(--pd-blue)}
+    .pd-burger .i-close{display:none}
+    .pd-header.is-menu .pd-burger .i-open{display:none}
+    .pd-header.is-menu .pd-burger .i-close{display:block}
+    .pd-header.is-menu .pd-pill{border-radius:0}
+    .pd-header.is-menu .pd-menu{display:block}
+    .pd-menu{background:#fff;border-top:1px solid var(--pd-line);border-radius:0 0 8px 8px;padding:28px 16px 24px;text-align:center}
+    .pd-menu a{display:block;font-size:22px;font-weight:600;letter-spacing:-.02em;padding:8px 0}
+    .pd-menu a:hover{color:var(--pd-blue)}
+    .pd-menu__lang{display:flex;justify-content:center;gap:18px;margin-top:22px}
+    .pd-menu__lang a{font-size:15px}
+    .hm-hero{min-height:500px}
+    .hm-slides--d{display:none}
+    .hm-slides--m{display:block}
+    .hm-hero__in{left:16px;right:16px;bottom:40px;align-items:stretch;gap:18px}
+    .hm-hero h1{font-size:28px}
+    .hm-hero__sub{font-size:16px}
+    .pd .hm-hero__btn{width:100%;height:48px;font-size:15px}
+    .hm-sheet{margin-top:-18px;border-radius:18px 18px 0 0}
+    .hm-band{height:auto;min-height:0;aspect-ratio:1/1;margin-top:40px}
+    .hm-mob{display:block}
+    .hm-desk{display:none}
+    .hm-story__head{grid-template-columns:auto 1fr auto;gap:14px;padding:14px 16px}
+    .hm-story__head--first{padding-top:24px}
+    .hm-story__head--first::before{top:10px;margin-top:0}
+    .hm-story__head h3{font-size:20px}
+    .hm-story__head p{grid-column:1/-1;font-size:13px}
+    .hm-story__head .hm-link{justify-self:end}
+    .hm-story__media{grid-template-columns:1fr;height:auto;min-height:0;padding:0 3px}
+    .hm-story__media figure{aspect-ratio:4/5}
+    .hm-story__media figure + figure{display:none}
+    .hm-story__cap{left:13px;bottom:14px}
+    .hm-row{grid-template-columns:repeat(2,minmax(0,1fr));gap:24px 3px;padding:3px 3px 0}
+    .hm-card__info{flex-direction:column;gap:3px;padding:8px 6px 0}
+    .hm-card__info b{display:block;margin:0 0 2px}
+    .hm-pano{height:86vh;min-height:480px;margin:0 3px 80px}
+    .hm-pano__txt{left:14px;right:14px;bottom:22px;flex-direction:column;align-items:flex-start;gap:16px}
+    .hm-pano__txt h2{font-size:clamp(44px,14vw,64px)}
+    .hm-tiles{grid-template-columns:1fr;gap:3px;padding:40px 3px 0}
+    .pd .hm-tile{height:70vh;min-height:420px}
+    .hm-tile__txt{left:14px;right:14px;bottom:16px}
+    .pd-foot{grid-template-columns:1fr auto;grid-template-areas:"logo logo" "copy right";height:auto;row-gap:14px;
+      margin:30px 10px 10px;padding:14px 16px;border-radius:20px}
+    .pd-foot__logo{grid-area:logo;justify-self:center}
+    .pd-foot__copy{grid-area:copy}
+    .pd-foot__r{grid-area:right;gap:12px}
+  }
+  @media (prefers-reduced-motion:reduce){
+    .hm-rv{opacity:1;transform:none;transition:none}
+    .hm-story__media img{opacity:1;transition:none}
+    .hm-card__media img{transform:none;transition:none}
+  }
+</style>
+<div class="pd">
+  <header class="pd-header">
+    <div class="pd-announce">
+      <span class="is-on">Free shipping on every order</span>
+      <span>Realtree Balloons &mdash; available now</span>
+      <span>&quot;only&quot; for outdoor use</span>
+    </div>
+    <div class="pd-pill">
+      <nav class="pd-nav">
+        <a href="/shop">shop</a>
+        <a href="/lookbook">lookbook</a>
+      </nav>
+      <a class="pd-logo" href="/"><img src="https://strklvskyy11.github.io/exmptmind-content/brand/logo-site.png" alt="exmptmind&trade;"></a>
+      <nav class="pd-nav pd-nav--r">
+        <a href="/ru">&#1088;&#1091;</a>
+        <a href="/about">about</a>
+        <a class="pd-bag" href="#bag" data-bag>bag<span data-bag-count="dash"></span></a>
+      </nav>
+      <div class="pd-mob">
+        <a href="#bag" data-bag aria-label="Bag"><svg viewBox="0 0 24 24"><path d="M5 8h14l-1 13H6L5 8z"/><path d="M9 8V6a3 3 0 016 0v2"/></svg><span class="pd-mob__count" data-bag-count="num"></span></a>
+        <button class="pd-burger" type="button" aria-label="Menu">
+          <svg class="i-open" viewBox="0 0 24 24"><path d="M3 8h18M3 16h18"/></svg>
+          <svg class="i-close" viewBox="0 0 24 24"><path d="M5 5l14 14M19 5L5 19"/></svg>
+        </button>
+      </div>
+    </div>
+    <nav class="pd-menu">
+      <a href="/shop">shop</a>
+      <a href="/lookbook">lookbook</a>
+      <a href="/about">about</a>
+      <div class="pd-menu__lang"><a href="/ru">&#1088;&#1091;</a><a href="/">eng</a></div>
+    </nav>
+  </header>
+  <section class="hm-hero">
+    <div class="hm-hero__media"><div class="hm-slides hm-slides--d">
+        <img class="hm-slide" data-srcset="https://strklvskyy11.github.io/exmptmind-content/home/w/01-DSC04581-480.webp 480w, https://strklvskyy11.github.io/exmptmind-content/home/w/01-DSC04581-800.webp 800w, https://strklvskyy11.github.io/exmptmind-content/home/w/01-DSC04581-1200.webp 1200w, https://strklvskyy11.github.io/exmptmind-content/home/w/01-DSC04581-1600.webp 1600w, https://strklvskyy11.github.io/exmptmind-content/home/w/01-DSC04581-2000.webp 2000w, https://strklvskyy11.github.io/exmptmind-content/home/w/01-DSC04581-2560.webp 2560w, https://strklvskyy11.github.io/exmptmind-content/home/w/01-DSC04581-3200.webp 3200w" data-sizes="(max-aspect-ratio: 16/9) calc(100vh * 1.78), 100vw" alt="" decoding="async" style="background:url(data:image/webp;base64,UklGRmAAAABXRUJQVlA4IFQAAACwAwCdASoYAA4APu1kqU2ppaQiMAgBMB2JQBOgBDiGjI6uRKDMwAD+WXr8VcN/fXueJ1lBdoeA0wx5nXBXz9hL6w+Oy8N3VD8x1nwHNMupR7WUwAA=) 50% 50%/cover">
+      </div>
+      <div class="hm-slides hm-slides--m">
+        <img class="hm-slide" data-srcset="https://strklvskyy11.github.io/exmptmind-content/home/w/01m-DSC03813-480.webp 480w, https://strklvskyy11.github.io/exmptmind-content/home/w/01m-DSC03813-800.webp 800w, https://strklvskyy11.github.io/exmptmind-content/home/w/01m-DSC03813-1200.webp 1200w, https://strklvskyy11.github.io/exmptmind-content/home/w/01m-DSC03813-1600.webp 1600w, https://strklvskyy11.github.io/exmptmind-content/home/w/01m-DSC03813-2000.webp 2000w, https://strklvskyy11.github.io/exmptmind-content/home/w/01m-DSC03813-2560.webp 2560w" data-sizes="(max-aspect-ratio: 9/16) calc(100vh * 0.5627), 100vw" alt="" decoding="async" style="background:url(data:image/webp;base64,UklGRqoAAABXRUJQVlA4IJ4AAACQBgCdASoYACsAPuFYqk2opKQiMBqtURAcCWUAxzAWmRXDYT7dF6JsSr71yUBlLSVUOa+9TA4if/aFaEKwAP7qr+F/oU68Y0Z3N/cz6sY0o+rLl4fJRqG9Vzvlcao1m9Ekr2536KEQp1hw1s+c+wu9SteVCDWjpbehRhWbxJxJ5bYPdUge+J9wWumQaNnQYrDVIqzuEqRuIIWwXAAAAA==) 50% 50%/cover">
+      </div></div>
+    <div class="hm-hero__shade"></div>
+    <div class="hm-hero__in">
+      <div class="hm-hero__l">
+        <h1>realtree balloons</h1>
+        <p class="hm-hero__sub">new drop // fw &#39;26</p>
+      </div>
+      <a class="hm-hero__btn" href="/shop/realtree-balloons">shop now</a>
+    </div>
+  </section>
+  <div class="hm-sheet">
+    <section class="hm-story">
+      <header class="hm-story__head hm-story__head--first">
+        <span class="hm-story__no">01</span>
+        <h3>realtree balloons</h3>
+        <a class="hm-link" href="/shop/realtree-balloons">shop now</a>
+      </header>
+      <div class="hm-story__media">
+        <figure><img src="https://strklvskyy11.github.io/exmptmind-content/home/w/02-rt37-1200.webp" srcset="https://strklvskyy11.github.io/exmptmind-content/home/w/02-rt37-480.webp 480w, https://strklvskyy11.github.io/exmptmind-content/home/w/02-rt37-800.webp 800w, https://strklvskyy11.github.io/exmptmind-content/home/w/02-rt37-1200.webp 1200w, https://strklvskyy11.github.io/exmptmind-content/home/w/02-rt37-1600.webp 1600w, https://strklvskyy11.github.io/exmptmind-content/home/w/02-rt37-2000.webp 2000w, https://strklvskyy11.github.io/exmptmind-content/home/w/02-rt37-2560.webp 2560w" sizes="(max-width:820px) 100vw, 50vw" alt="" loading="lazy" decoding="async" style="background:url(data:image/webp;base64,UklGRvAAAABXRUJQVlA4IOQAAAAwBgCdASoYACQAPulgqU2pJaQiKq35IB0JQBcGAsREAxVnCw4I/jd6a8aPXbnFXKIvcT3+Fs04LUeAAP7x3xH8OtYq9ZXwqggGcgUi/QcnontC6mlP7PZjoopRShoLOIDdTHlyOeTJu6t0+WPFmWbPpgAlsaokMPf/OJyli4Y+OAzxQycXU8gWTvBb2tUoruCdTqzctqc0hx+CYr94+0R71lg7RyF4J1uvpgmBlvX3N58d+Nr7HeS7NAhuBSS9R1TTOWbDHQIqRdWfvNh+3cI25/lkrJc31j8yMsIjxouXLAqsAAA=) 50% 50%/cover"></figure>
+        <figure><img src="https://strklvskyy11.github.io/exmptmind-content/home/w/03-rt8-1200.webp" srcset="https://strklvskyy11.github.io/exmptmind-content/home/w/03-rt8-480.webp 480w, https://strklvskyy11.github.io/exmptmind-content/home/w/03-rt8-800.webp 800w, https://strklvskyy11.github.io/exmptmind-content/home/w/03-rt8-1200.webp 1200w, https://strklvskyy11.github.io/exmptmind-content/home/w/03-rt8-1600.webp 1600w, https://strklvskyy11.github.io/exmptmind-content/home/w/03-rt8-2000.webp 2000w, https://strklvskyy11.github.io/exmptmind-content/home/w/03-rt8-2560.webp 2560w" sizes="(max-width:820px) 100vw, 50vw" alt="" loading="lazy" decoding="async" style="background:url(data:image/webp;base64,UklGRqYAAABXRUJQVlA4IJoAAAAQBgCdASoYACQAPuFgo02opiMiNVgMARAcCWIAs4AWJ2U6w80EeHnq/bnREFVLo8UoWY90/NTHSgAA/vVvx3LYLRTPWC7ppxg+r5PH/+ODRoiKRZZjZGdj9ObBMjAhg1eUfCIMwyq69J9sA6GiOQE3aTd6nZvsKiBdEPFHgpFpRXuQpiBYN8Q+xWpWECsCS1sdfSveY2gc1CAA) 50% 50%/cover"></figure>
+        <p class="hm-story__cap">realtree balloons + crop jersey tee white</p>
+      </div>
+      <div class="hm-row">
+        <a class="hm-card is-pack" href="/shop/realtree-balloons">
+          <div class="hm-card__media"><span class="hm-card__tag">new</span>
+            <img src="https://strklvskyy11.github.io/exmptmind-content/products/w/realtree-balloons-pack-front-1070.webp" srcset="https://strklvskyy11.github.io/exmptmind-content/products/w/realtree-balloons-pack-front-480.webp 480w, https://strklvskyy11.github.io/exmptmind-content/products/w/realtree-balloons-pack-front-800.webp 800w, https://strklvskyy11.github.io/exmptmind-content/products/w/realtree-balloons-pack-front-1070.webp 1070w" sizes="(max-width:820px) 50vw, 25vw" alt="" loading="lazy" decoding="async" style="background:url(data:image/webp;base64,UklGRngAAABXRUJQVlA4IGwAAADwBACdASoYACEAPt1cpU2opSOiNUgBEBuJZwDO7Cza1TCAPMB18PURDqFsI9IcoBAA/vHEuCbhcdqkARunmolBgZIMwzXXFwHWM873DebZ4qEBxweuLEa0+PraU2vwo1CFujNd6n9s+cn8AAA=) 50% 50%/cover">
+          </div>
+          <div class="hm-card__info"><p><b>Realtree Balloons</b><span>Light Khaki Camo</span></p><p><span data-p="realtree_balloons">14&nbsp;700&nbsp;&#8381;</span></p></div>
+        </a>
+        <a class="hm-card" href="/shop/crop-jersey-tee-white">
+          <div class="hm-card__media">
+            <img src="https://strklvskyy11.github.io/exmptmind-content/products/w/crop-jersey-tee-white-01-IMG_5864-1200.webp" srcset="https://strklvskyy11.github.io/exmptmind-content/products/w/crop-jersey-tee-white-01-IMG_5864-480.webp 480w, https://strklvskyy11.github.io/exmptmind-content/products/w/crop-jersey-tee-white-01-IMG_5864-800.webp 800w, https://strklvskyy11.github.io/exmptmind-content/products/w/crop-jersey-tee-white-01-IMG_5864-1200.webp 1200w, https://strklvskyy11.github.io/exmptmind-content/products/w/crop-jersey-tee-white-01-IMG_5864-1600.webp 1600w, https://strklvskyy11.github.io/exmptmind-content/products/w/crop-jersey-tee-white-01-IMG_5864-2000.webp 2000w, https://strklvskyy11.github.io/exmptmind-content/products/w/crop-jersey-tee-white-01-IMG_5864-2560.webp 2560w" sizes="(max-width:820px) 50vw, 25vw" alt="" loading="lazy" decoding="async" style="background:url(data:image/webp;base64,UklGRpoAAABXRUJQVlA4II4AAAAQBgCdASoYACsAPu1gqk6ppSOiNVQIATAdiWcAyUw1t9HhVzxY866u5VjKPWku03ysxJcjHCCk1AAA/r54FIpcp0mv1eLt+hILOnlZ2JQgXjTMYIwaEukWoLXXjGRSjNMsDK9OrkzScygXdjBjhS4KKdHyR/QWP2tM7JLOC4TO5lVvLEUGKJliYYRggAAA) 50% 50%/cover">
+          </div>
+          <div class="hm-card__info"><p><b>Crop Jersey Tee</b><span>White</span></p><p><span data-p="crop_jersey_tee_white">4&nbsp;900&nbsp;&#8381;</span></p></div>
+        </a>
+        <a class="hm-card hm-card--look" href="/shop/realtree-balloons">
+          <div class="hm-card__media"><img src="https://strklvskyy11.github.io/exmptmind-content/home/w/06-rt15-1200.webp" srcset="https://strklvskyy11.github.io/exmptmind-content/home/w/06-rt15-480.webp 480w, https://strklvskyy11.github.io/exmptmind-content/home/w/06-rt15-800.webp 800w, https://strklvskyy11.github.io/exmptmind-content/home/w/06-rt15-1200.webp 1200w, https://strklvskyy11.github.io/exmptmind-content/home/w/06-rt15-1600.webp 1600w, https://strklvskyy11.github.io/exmptmind-content/home/w/06-rt15-2000.webp 2000w, https://strklvskyy11.github.io/exmptmind-content/home/w/06-rt15-2560.webp 2560w" sizes="(max-width:820px) 50vw, 25vw" alt="" loading="lazy" decoding="async" style="background:url(data:image/webp;base64,UklGRv4AAABXRUJQVlA4IPIAAAAwBwCdASoYACQAPu1orU+ppiQiKqoBMB2JQBWHKCqaqvwpLhoDb1YG69wkKfl4EG1sztcv4QdQzY7FS6ZKYuUdoAAA/u6SH6vsP42LT1weVSHHj3qGsh/1A/kqShjdKhe8E/qfXmPupO+PTwt1VJMOTsHpF5rQjlcFkpZnaYIpo5qdBwm6dysXFvZtH1+rz7FzwXq96XoR9bXWb4cQYOWheZ+x9q6XEVVLUCiYrk1TV5ZOWP9tzSGu/ZB6MWRmortqxZ1slsgkq6VpC8IQI+SXbdgkP0S8Ip5JCjlroyIoWPGTwEKcWk62BqUxVJoF8IAAAA==) 50% 50%/cover"></div>
+          <div class="hm-card__info"><p><b>look 01</b><span>realtree balloons</span></p></div>
+        </a>
+        <a class="hm-card hm-card--look" href="/shop/realtree-balloons">
+          <div class="hm-card__media"><img src="https://strklvskyy11.github.io/exmptmind-content/home/w/07-rt2-1200.webp" srcset="https://strklvskyy11.github.io/exmptmind-content/home/w/07-rt2-480.webp 480w, https://strklvskyy11.github.io/exmptmind-content/home/w/07-rt2-800.webp 800w, https://strklvskyy11.github.io/exmptmind-content/home/w/07-rt2-1200.webp 1200w, https://strklvskyy11.github.io/exmptmind-content/home/w/07-rt2-1600.webp 1600w, https://strklvskyy11.github.io/exmptmind-content/home/w/07-rt2-2000.webp 2000w, https://strklvskyy11.github.io/exmptmind-content/home/w/07-rt2-2560.webp 2560w" sizes="(max-width:820px) 50vw, 25vw" alt="" loading="lazy" decoding="async" style="background:url(data:image/webp;base64,UklGRrgAAABXRUJQVlA4IKwAAADwBQCdASoYACQAPt1ao02opSMiOrZoARAbiWMAtsgUPFaqCgnM9XRZ5st+8KmSVv3AyquNhcbQAAD+80nChFTxgNbh/BXFePeRaKh2se0mNcu3K4kPcbTt3VdDAxxz1TsM/vdSgTau/L4Q4wJLlOFZsWQtlthKuL8yQqT7enXLbTs3QioERiIYKbN+aSY0lyBXqDYPDa9algL2H+XXI5lINsiHWwU0ZpaffhAA) 50% 50%/cover"></div>
+          <div class="hm-card__info"><p><b>look 02</b><span>realtree balloons</span></p></div>
+        </a>
+      </div>
+      <div class="hm-band"><div class="hm-ph hm-ph--photo hm-mob"><span>08</span></div>
+      <picture class="hm-desk"><source media="(max-width:820px)" srcset="data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw=="><img src="https://strklvskyy11.github.io/exmptmind-content/home/w/08-kp80-1200.webp" srcset="https://strklvskyy11.github.io/exmptmind-content/home/w/08-kp80-480.webp 480w, https://strklvskyy11.github.io/exmptmind-content/home/w/08-kp80-800.webp 800w, https://strklvskyy11.github.io/exmptmind-content/home/w/08-kp80-1200.webp 1200w, https://strklvskyy11.github.io/exmptmind-content/home/w/08-kp80-1600.webp 1600w, https://strklvskyy11.github.io/exmptmind-content/home/w/08-kp80-2000.webp 2000w, https://strklvskyy11.github.io/exmptmind-content/home/w/08-kp80-2560.webp 2560w, https://strklvskyy11.github.io/exmptmind-content/home/w/08-kp80-3200.webp 3200w" sizes="100vw" alt="" loading="lazy" decoding="async" style="background:url(data:image/webp;base64,UklGRowAAABXRUJQVlA4IIAAAADwAwCdASoYABAAPu1mqk4ppaOiMAgBMB2JaACdMoACref2II9aTPskAP5qIjsQ48ybFvH1CkRFgtfyC7Zw9fWVVsLdGOvJqQivKacRkR37nQZRqu1sbdnGRcD22GP5aqFuuaoTubutXAW9tpX/QsP1H+FUGUxfkeV7lYqYOrmIAA==) 50% 50%/cover"></picture></div>
+    </section>
+    <section class="hm-story">
+      <header class="hm-story__head">
+        <span class="hm-story__no">02</span>
+        <h3>og cargo pants</h3>
+        <a class="hm-link" href="/shop/og-cargo-pants-hiker-moss">shop now</a>
+      </header>
+      <div class="hm-story__media">
+        <figure><img src="https://strklvskyy11.github.io/exmptmind-content/home/w/09-pn19-1200.webp" srcset="https://strklvskyy11.github.io/exmptmind-content/home/w/09-pn19-480.webp 480w, https://strklvskyy11.github.io/exmptmind-content/home/w/09-pn19-800.webp 800w, https://strklvskyy11.github.io/exmptmind-content/home/w/09-pn19-1200.webp 1200w, https://strklvskyy11.github.io/exmptmind-content/home/w/09-pn19-1600.webp 1600w, https://strklvskyy11.github.io/exmptmind-content/home/w/09-pn19-2000.webp 2000w, https://strklvskyy11.github.io/exmptmind-content/home/w/09-pn19-2560.webp 2560w" sizes="(max-width:820px) 100vw, 50vw" alt="" loading="lazy" decoding="async" style="background:url(data:image/webp;base64,UklGRs4AAABXRUJQVlA4IMIAAAAQBgCdASoYACQAPu1ysFOppqQipWgBMB2JYwC4MFDeXAX7ovXhrIAym3cpbe+/FTjppynnOiobBgAA/vhn9YMMifLhULPa1Vh1H9YLVrrS/oUQBA+TRLdbO/FZq347hCPFPdP19zX241sv3UIg1K4yhLrBnwJ/l8crJaLrL/otZVAfkFkWxRtIa9WdpM+nYwNra12WpnFf46JmfUG9pUBfcIXE/IeqHoS2qdA4xHXD8H7DTUsjC+20YT4sOKyUKyAAAA==) 50% 50%/cover"></figure>
+        <figure><img src="https://strklvskyy11.github.io/exmptmind-content/home/w/10-pn17-1200.webp" srcset="https://strklvskyy11.github.io/exmptmind-content/home/w/10-pn17-480.webp 480w, https://strklvskyy11.github.io/exmptmind-content/home/w/10-pn17-800.webp 800w, https://strklvskyy11.github.io/exmptmind-content/home/w/10-pn17-1200.webp 1200w, https://strklvskyy11.github.io/exmptmind-content/home/w/10-pn17-1600.webp 1600w, https://strklvskyy11.github.io/exmptmind-content/home/w/10-pn17-2000.webp 2000w, https://strklvskyy11.github.io/exmptmind-content/home/w/10-pn17-2560.webp 2560w" sizes="(max-width:820px) 100vw, 50vw" alt="" loading="lazy" decoding="async" style="background:url(data:image/webp;base64,UklGRtgAAABXRUJQVlA4IMwAAABQBgCdASoYACQAPu1wqlEppqOiqrgKATAdiWUAyywHjcXhqgws2AIjYTFz0zeCRMN4cGtJa3X2LkvjgAD+7L8Nw2IdPsGCqu2p6uPt9gETj+VauuzWypo01hShmXA9jWofH3RU4p5mpK9c2kt0u6NsM8mVApY71p5fksRQcF/ZuSRnXrjClGjT5peqTG8uILgGf44xb8xqloSdcjMOKgs9VwgTHBmdomlmAVinDaQTSOIRkuK4j1BtiCQE/wDntsxZTE23/C7QMKQAAAA=) 50% 50%/cover"></figure>
+        <p class="hm-story__cap">og cargo pants: hiker moss / utility black</p>
+      </div>
+      <div class="hm-row">
+        <a class="hm-card" href="/shop/og-cargo-pants-hiker-moss">
+          <div class="hm-card__media">
+            <img src="https://strklvskyy11.github.io/exmptmind-content/products/w/og-cargo-pants-hiker-moss-01-13-1200.webp" srcset="https://strklvskyy11.github.io/exmptmind-content/products/w/og-cargo-pants-hiker-moss-01-13-480.webp 480w, https://strklvskyy11.github.io/exmptmind-content/products/w/og-cargo-pants-hiker-moss-01-13-800.webp 800w, https://strklvskyy11.github.io/exmptmind-content/products/w/og-cargo-pants-hiker-moss-01-13-1200.webp 1200w, https://strklvskyy11.github.io/exmptmind-content/products/w/og-cargo-pants-hiker-moss-01-13-1600.webp 1600w, https://strklvskyy11.github.io/exmptmind-content/products/w/og-cargo-pants-hiker-moss-01-13-2000.webp 2000w, https://strklvskyy11.github.io/exmptmind-content/products/w/og-cargo-pants-hiker-moss-01-13-2560.webp 2560w" sizes="(max-width:820px) 50vw, 25vw" alt="" loading="lazy" decoding="async" style="background:url(data:image/webp;base64,UklGRqgAAABXRUJQVlA4IJwAAAAQBgCdASoYACQAPu1orE2ppiSiKqwBMB2JZwDO7BISWeq6+43PPKJaZUr3wnzLknSEYXZ2gKZRVAAA/nG2nGSd9u6BWfoz2naZO6cVS2Ai73yJEIcjx6QM1V8Zlq/OLWGFG1hp07cU+a/uqnAQDP5LQ86ZbBMg0iSxlfdBcrdkLYVM37+zkfq+ukcziIstONSwRpkOVFY1/XIAAAA=) 50% 50%/cover">
+          </div>
+          <div class="hm-card__info"><p><b>OG Cargo Pants</b><span>Hiker Moss</span></p><p><span data-p="og_cargo_pants_hiker_moss">12&nbsp;900&nbsp;&#8381;</span></p></div>
+        </a>
+        <a class="hm-card" href="/shop/og-cargo-pants-utility-black">
+          <div class="hm-card__media">
+            <img src="https://strklvskyy11.github.io/exmptmind-content/products/w/og-cargo-pants-utility-black-01-32-1200.webp" srcset="https://strklvskyy11.github.io/exmptmind-content/products/w/og-cargo-pants-utility-black-01-32-480.webp 480w, https://strklvskyy11.github.io/exmptmind-content/products/w/og-cargo-pants-utility-black-01-32-800.webp 800w, https://strklvskyy11.github.io/exmptmind-content/products/w/og-cargo-pants-utility-black-01-32-1200.webp 1200w, https://strklvskyy11.github.io/exmptmind-content/products/w/og-cargo-pants-utility-black-01-32-1600.webp 1600w, https://strklvskyy11.github.io/exmptmind-content/products/w/og-cargo-pants-utility-black-01-32-2000.webp 2000w, https://strklvskyy11.github.io/exmptmind-content/products/w/og-cargo-pants-utility-black-01-32-2560.webp 2560w" sizes="(max-width:820px) 50vw, 25vw" alt="" loading="lazy" decoding="async" style="background:url(data:image/webp;base64,UklGRqoAAABXRUJQVlA4IJ4AAABwBgCdASoYACQAPu1mq1AppSOiqrgMATAdiWUAygAHv+tUtyuBm/1YXINbBfJG3qUu5+v7g+TWr8CzwAAA/rvqLcWAarWsydOk1zYhAv0moKn7DAXpG8PNT3YZyFUDvMIJf45re7eVEvuoPm6r/QX5FNHKkOLS4SpOWFz7Hdqck6S9fWQ0V9+y1FUmpBj3p+xIa7/b4hkM0KD37AAAAA==) 50% 50%/cover">
+          </div>
+          <div class="hm-card__info"><p><b>OG Cargo Pants</b><span>Utility Black</span></p><p><span data-p="og_cargo_pants_utility_black">12&nbsp;900&nbsp;&#8381;</span></p></div>
+        </a>
+        <a class="hm-card hm-card--look" href="/shop/og-cargo-pants-hiker-moss">
+          <div class="hm-card__media"><img src="https://strklvskyy11.github.io/exmptmind-content/home/w/13-kp11-1200.webp" srcset="https://strklvskyy11.github.io/exmptmind-content/home/w/13-kp11-480.webp 480w, https://strklvskyy11.github.io/exmptmind-content/home/w/13-kp11-800.webp 800w, https://strklvskyy11.github.io/exmptmind-content/home/w/13-kp11-1200.webp 1200w, https://strklvskyy11.github.io/exmptmind-content/home/w/13-kp11-1600.webp 1600w, https://strklvskyy11.github.io/exmptmind-content/home/w/13-kp11-2000.webp 2000w, https://strklvskyy11.github.io/exmptmind-content/home/w/13-kp11-2560.webp 2560w" sizes="(max-width:820px) 50vw, 25vw" alt="" loading="lazy" decoding="async" style="background:url(data:image/webp;base64,UklGRrAAAABXRUJQVlA4IKQAAADQBQCdASoYACQAPu1krFAppSQqKrgMAUAdiUAX/YjDY2POE4XrxSkrAlDMcCh40TU3gPOVJHgQAP6x5Ku1A3b0DrTt/hpPOr8wIKTgcYq9csBrlGXaIZOC8MkCEvhz0pN99+TjMd9DlpZ797YuR6ZYxqC5VTaYTxsQ6FAXLyYFCNe8YBmywsefdlpunQC8JBudj2PqVE6cq7uvPbk589eUYAAAAA==) 50% 50%/cover"></div>
+          <div class="hm-card__info"><p><b>look 01</b><span>og cargo pants</span></p></div>
+        </a>
+        <a class="hm-card hm-card--look" href="/shop/og-cargo-pants-hiker-moss">
+          <div class="hm-card__media"><img src="https://strklvskyy11.github.io/exmptmind-content/home/w/14-kp5-1200.webp" srcset="https://strklvskyy11.github.io/exmptmind-content/home/w/14-kp5-480.webp 480w, https://strklvskyy11.github.io/exmptmind-content/home/w/14-kp5-800.webp 800w, https://strklvskyy11.github.io/exmptmind-content/home/w/14-kp5-1200.webp 1200w, https://strklvskyy11.github.io/exmptmind-content/home/w/14-kp5-1600.webp 1600w, https://strklvskyy11.github.io/exmptmind-content/home/w/14-kp5-2000.webp 2000w, https://strklvskyy11.github.io/exmptmind-content/home/w/14-kp5-2560.webp 2560w" sizes="(max-width:820px) 50vw, 25vw" alt="" loading="lazy" decoding="async" style="background:url(data:image/webp;base64,UklGRqgAAABXRUJQVlA4IJwAAABQBgCdASoYACQAPu1gqU4ppSOiMBVdUTAdiUAWWYuvGGzDseeHddPEG6zLTriSTnFUTSGS9jmcMZVAAAD++W5BwSxkio5XOEi9wmHf0LqAy0nGt86oNgUaLQuH1P80/iij74epVWjLdYhi6fzADeZ+IUC7I9zJIWgsrTAfnnodLlUPteIGPehKm6Z9OkOGFHK7gQbDyzU3vd7ZAAA=) 50% 50%/cover"></div>
+          <div class="hm-card__info"><p><b>look 02</b><span>og cargo pants</span></p></div>
+        </a>
+      </div>
+      <div class="hm-band"><div class="hm-ph hm-ph--photo hm-mob"><span>15</span></div>
+      <picture class="hm-desk"><source media="(max-width:820px)" srcset="data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw=="><img src="https://strklvskyy11.github.io/exmptmind-content/home/w/15-DSC03230-1200.webp" srcset="https://strklvskyy11.github.io/exmptmind-content/home/w/15-DSC03230-480.webp 480w, https://strklvskyy11.github.io/exmptmind-content/home/w/15-DSC03230-800.webp 800w, https://strklvskyy11.github.io/exmptmind-content/home/w/15-DSC03230-1200.webp 1200w, https://strklvskyy11.github.io/exmptmind-content/home/w/15-DSC03230-1600.webp 1600w, https://strklvskyy11.github.io/exmptmind-content/home/w/15-DSC03230-2000.webp 2000w, https://strklvskyy11.github.io/exmptmind-content/home/w/15-DSC03230-2560.webp 2560w, https://strklvskyy11.github.io/exmptmind-content/home/w/15-DSC03230-3200.webp 3200w" sizes="100vw" alt="" loading="lazy" decoding="async" style="background:url(data:image/webp;base64,UklGRn4AAABXRUJQVlA4IHIAAAAwBACdASoYAA4APu1iqU2ppaOiMAgBMB2JZQDKABukdtYLBZoqLxf+ngAA/u+N3Ei9oGmylFoq83SkKU3UeN54wSlLn1aEF6DIqVH8sFwVXpA4Ox0eJaf1tHLMtCDELYYXsg8U6dJGKOpnHLxAhTXSwAA=) 50% 50%/cover"></picture></div>
+    </section>
+    <section class="hm-story">
+      <header class="hm-story__head">
+        <span class="hm-story__no">03</span>
+        <h3>crop jersey tee</h3>
+        <a class="hm-link" href="/shop/crop-jersey-tee-black">shop now</a>
+      </header>
+      <div class="hm-story__media">
+        <figure><img src="https://strklvskyy11.github.io/exmptmind-content/home/w/16-DSC03103-1200.webp" srcset="https://strklvskyy11.github.io/exmptmind-content/home/w/16-DSC03103-480.webp 480w, https://strklvskyy11.github.io/exmptmind-content/home/w/16-DSC03103-800.webp 800w, https://strklvskyy11.github.io/exmptmind-content/home/w/16-DSC03103-1200.webp 1200w, https://strklvskyy11.github.io/exmptmind-content/home/w/16-DSC03103-1600.webp 1600w, https://strklvskyy11.github.io/exmptmind-content/home/w/16-DSC03103-2000.webp 2000w, https://strklvskyy11.github.io/exmptmind-content/home/w/16-DSC03103-2560.webp 2560w" sizes="(max-width:820px) 100vw, 50vw" alt="" loading="lazy" decoding="async" style="background:url(data:image/webp;base64,UklGRgABAABXRUJQVlA4IPQAAADwBgCdASoYACsAPu1qsFIppSSiqrgIATAdiWUAxrget/QRE7GzyX1fvrG/97GYDyi7fjelZQ5rjmhf9twnNBoAAP7lO3q9kpEXYQ7/KeJfPfgSm+KS3+gicbQVmqXoQ0o+YERyfr7WpfnIPRxDtKH8fBQlNRzHjE7IVz1sVKpSVra5Yyz5S868qGaQsAzSXjLE2VLrMxotwF1MN1AX3Xm4ylqC+7ZbxPD6aLuJOveV3TegBsajJ4gEU52tDARMP+7OvRkD/Jz0TQ3PXG7JrbMbm3Fl2zkkddx3MLBmp49qhc//j+4NZNKkbmjnPPrtw6cZQAAA) 50% 50%/cover"></figure>
+        <figure><img src="https://strklvskyy11.github.io/exmptmind-content/home/w/17-IMG_6694-1200.webp" srcset="https://strklvskyy11.github.io/exmptmind-content/home/w/17-IMG_6694-480.webp 480w, https://strklvskyy11.github.io/exmptmind-content/home/w/17-IMG_6694-800.webp 800w, https://strklvskyy11.github.io/exmptmind-content/home/w/17-IMG_6694-1200.webp 1200w, https://strklvskyy11.github.io/exmptmind-content/home/w/17-IMG_6694-1600.webp 1600w, https://strklvskyy11.github.io/exmptmind-content/home/w/17-IMG_6694-2000.webp 2000w, https://strklvskyy11.github.io/exmptmind-content/home/w/17-IMG_6694-2560.webp 2560w" sizes="(max-width:820px) 100vw, 50vw" alt="" loading="lazy" decoding="async" style="background:url(data:image/webp;base64,UklGRoIAAABXRUJQVlA4IHYAAADQBACdASoYACAAPu1oq0+ppiOiMBgIATAdiWcAxNgBfruKHn59m9Rl+xtq5VMb4AD+j6i4ZJ083uVKRueAwq9NX+moV3fWGYP5bODEz0VoPIE0D15XHwfKuhc9lV80pOWoC15ZIHg6oWv+uhAFLwO4OfUcAAAA) 50% 50%/cover"></figure>
+        <p class="hm-story__cap">crop jersey tee: white / black</p>
+      </div>
+      <div class="hm-row">
+        <a class="hm-card" href="/shop/crop-jersey-tee-black">
+          <div class="hm-card__media">
+            <img src="https://strklvskyy11.github.io/exmptmind-content/products/w/crop-jersey-tee-black-01-IMG_5872-1200.webp" srcset="https://strklvskyy11.github.io/exmptmind-content/products/w/crop-jersey-tee-black-01-IMG_5872-480.webp 480w, https://strklvskyy11.github.io/exmptmind-content/products/w/crop-jersey-tee-black-01-IMG_5872-800.webp 800w, https://strklvskyy11.github.io/exmptmind-content/products/w/crop-jersey-tee-black-01-IMG_5872-1200.webp 1200w, https://strklvskyy11.github.io/exmptmind-content/products/w/crop-jersey-tee-black-01-IMG_5872-1600.webp 1600w, https://strklvskyy11.github.io/exmptmind-content/products/w/crop-jersey-tee-black-01-IMG_5872-2000.webp 2000w, https://strklvskyy11.github.io/exmptmind-content/products/w/crop-jersey-tee-black-01-IMG_5872-2560.webp 2560w" sizes="(max-width:820px) 50vw, 25vw" alt="" loading="lazy" decoding="async" style="background:url(data:image/webp;base64,UklGRogAAABXRUJQVlA4IHwAAACQBQCdASoYACsAPu1iqk6ppSOptVQIATAdiWcA0bw2R6F2VO8AQHL7ZBpPnsecid5zvyR6AAD+uckXGeYnVOKhJvDS6xwqk8jQkvLLujYPLiFbQAxBoMDnfwGZ4TNyLwATX2n8UiBJrA7CnKa9ggQK8fagq9T+i+LcHgAA) 50% 50%/cover">
+          </div>
+          <div class="hm-card__info"><p><b>Crop Jersey Tee</b><span>Black</span></p><p><span data-p="crop_jersey_tee_black">4&nbsp;900&nbsp;&#8381;</span></p></div>
+        </a>
+        <a class="hm-card" href="/shop/crop-jersey-tee-white">
+          <div class="hm-card__media">
+            <img src="https://strklvskyy11.github.io/exmptmind-content/products/w/crop-jersey-tee-white-01-IMG_5864-1200.webp" srcset="https://strklvskyy11.github.io/exmptmind-content/products/w/crop-jersey-tee-white-01-IMG_5864-480.webp 480w, https://strklvskyy11.github.io/exmptmind-content/products/w/crop-jersey-tee-white-01-IMG_5864-800.webp 800w, https://strklvskyy11.github.io/exmptmind-content/products/w/crop-jersey-tee-white-01-IMG_5864-1200.webp 1200w, https://strklvskyy11.github.io/exmptmind-content/products/w/crop-jersey-tee-white-01-IMG_5864-1600.webp 1600w, https://strklvskyy11.github.io/exmptmind-content/products/w/crop-jersey-tee-white-01-IMG_5864-2000.webp 2000w, https://strklvskyy11.github.io/exmptmind-content/products/w/crop-jersey-tee-white-01-IMG_5864-2560.webp 2560w" sizes="(max-width:820px) 50vw, 25vw" alt="" loading="lazy" decoding="async" style="background:url(data:image/webp;base64,UklGRpoAAABXRUJQVlA4II4AAAAQBgCdASoYACsAPu1gqk6ppSOiNVQIATAdiWcAyUw1t9HhVzxY866u5VjKPWku03ysxJcjHCCk1AAA/r54FIpcp0mv1eLt+hILOnlZ2JQgXjTMYIwaEukWoLXXjGRSjNMsDK9OrkzScygXdjBjhS4KKdHyR/QWP2tM7JLOC4TO5lVvLEUGKJliYYRggAAA) 50% 50%/cover">
+          </div>
+          <div class="hm-card__info"><p><b>Crop Jersey Tee</b><span>White</span></p><p><span data-p="crop_jersey_tee_white">4&nbsp;900&nbsp;&#8381;</span></p></div>
+        </a>
+        <a class="hm-card hm-card--look" href="/shop/crop-jersey-tee-black">
+          <div class="hm-card__media"><img src="https://strklvskyy11.github.io/exmptmind-content/home/w/20-IMG_6610-1200.webp" srcset="https://strklvskyy11.github.io/exmptmind-content/home/w/20-IMG_6610-480.webp 480w, https://strklvskyy11.github.io/exmptmind-content/home/w/20-IMG_6610-800.webp 800w, https://strklvskyy11.github.io/exmptmind-content/home/w/20-IMG_6610-1200.webp 1200w, https://strklvskyy11.github.io/exmptmind-content/home/w/20-IMG_6610-1600.webp 1600w, https://strklvskyy11.github.io/exmptmind-content/home/w/20-IMG_6610-2000.webp 2000w, https://strklvskyy11.github.io/exmptmind-content/home/w/20-IMG_6610-2560.webp 2560w" sizes="(max-width:820px) 50vw, 25vw" alt="" loading="lazy" decoding="async" style="background:url(data:image/webp;base64,UklGRuAAAABXRUJQVlA4INQAAACwBQCdASoYACAAPu1ip04ppSMiMBgMATAdiUAWcLWgEtBCJPlTLcQ3Ulu2RN15XDxoCGNbMKAA/q1cMJlAID31OVTtmi3l7GY9j5SH3Dx0WPzSdJ1WiTLvyYyLuNC8RekK8W+nm+gLJWYx8UzivBH6bgkyeTsVrmZlMCFra9/mRJ4amC5ALSze06kH2a+skeDGyDJwimBhKbVXGuB32cewiBBdRrbDcbfCD8uo73X9o72r0SxGPY6JuLfR2Te+YOKymWysGk5sQPPWhuX0wh8zeswAAA==) 50% 50%/cover"></div>
+          <div class="hm-card__info"><p><b>look 01</b><span>crop jersey tee</span></p></div>
+        </a>
+        <a class="hm-card hm-card--look" href="/shop/crop-jersey-tee-black">
+          <div class="hm-card__media"><img src="https://strklvskyy11.github.io/exmptmind-content/home/w/21-IMG_6600-1200.webp" srcset="https://strklvskyy11.github.io/exmptmind-content/home/w/21-IMG_6600-480.webp 480w, https://strklvskyy11.github.io/exmptmind-content/home/w/21-IMG_6600-800.webp 800w, https://strklvskyy11.github.io/exmptmind-content/home/w/21-IMG_6600-1200.webp 1200w, https://strklvskyy11.github.io/exmptmind-content/home/w/21-IMG_6600-1600.webp 1600w, https://strklvskyy11.github.io/exmptmind-content/home/w/21-IMG_6600-2000.webp 2000w, https://strklvskyy11.github.io/exmptmind-content/home/w/21-IMG_6600-2560.webp 2560w" sizes="(max-width:820px) 50vw, 25vw" alt="" loading="lazy" decoding="async" style="background:url(data:image/webp;base64,UklGRpQAAABXRUJQVlA4IIgAAABQBQCdASoYACAAPu1opk2ppiMiMBgMATAdiWUAyJgxUC5lnA224UjDOkOK9Z3t28jufxAA/Ctbxz0sj2KfdXkvlgzDub+t/RGiLWWxUpp2BnONHnt7XmpT3vVK2JysBrek/QHDGB8npmZZWz5HMNWse5wDyKxUriKVtzEJjUyL0D5GzvpgAAAA) 50% 50%/cover"></div>
+          <div class="hm-card__info"><p><b>look 02</b><span>crop jersey tee</span></p></div>
+        </a>
+      </div>
+    </section>
+    <section class="hm-tiles">
+      <a class="hm-tile hm-rv" href="/about">
+        <div class="hm-ph hm-ph--photo"><span>22</span></div>
+        <div class="hm-tile__txt"><div><b>about</b><span>from a newspaper graphic to 2 000 metres. the exmptmind&trade; trail.</span></div><i>read</i></div>
+      </a>
+      <a class="hm-tile hm-rv" href="/lookbook">
+        <div class="hm-ph hm-ph--photo"><span>23</span></div>
+        <div class="hm-tile__txt"><div><b>lookbook</b><span>every shoot in one place: mountains, city, friends.</span></div><i>open</i></div>
+      </a>
+    </section>
+  <footer class="pd-foot">
+    <span class="pd-foot__copy">Beyond the Limits&reg; 2026</span>
+    <a class="pd-foot__logo" href="/"><img src="https://strklvskyy11.github.io/exmptmind-content/brand/logo-site.png" alt="exmptmind&trade;"></a>
+    <div class="pd-foot__r">
+      <a href="https://www.instagram.com/exmptmind/" target="_blank" rel="noopener">Instagram</a>
+      <a href="https://t.me/exmptmind" target="_blank" rel="noopener">Telegram</a>
+      <a href="https://pinterest.com/exmptmind/" target="_blank" rel="noopener">Pinterest</a>
+      <span class="pd-foot__lang"><a href="/ru">&#1088;&#1091;</a>/<a href="/">eng</a></span>
+    </div>
+  </footer>
+  </div>
+  <style>
+    .t706__carticon{display:none!important}
+    .pd .pd-size.is-sold,.pd .pd-lb__size.is-sold{color:#BDBDBD;border-color:#EDEDED;text-decoration:line-through;pointer-events:none}
+    .pd [data-cart].is-sold{opacity:.35;pointer-events:none}
+    .pd .cb{position:fixed;inset:0;z-index:10002;visibility:hidden;pointer-events:none}
+    .pd .cb.is-open{visibility:visible;pointer-events:auto}
+    .pd .cb__bg{position:absolute;inset:0;background:rgba(0,0,0,.35);opacity:0;transition:opacity .35s ease}
+    .pd .cb.is-open .cb__bg{opacity:1}
+    .pd .cb__panel{position:absolute;top:10px;right:10px;bottom:10px;width:min(460px,calc(100% - 20px));display:flex;flex-direction:column;
+      background:#fff;border-radius:12px;overflow:hidden;transform:translateX(calc(100% + 24px));transition:transform .45s cubic-bezier(.2,.7,.2,1)}
+    .pd .cb.is-open .cb__panel{transform:none}
+    .pd .cb__head{flex:none;display:flex;justify-content:space-between;align-items:center;height:48px;padding:0 10px 0 18px;background:#E8E9EB}
+    .pd .cb__title{font-size:13px;font-weight:600}
+    .pd .cb__title i{font-style:normal;font-weight:400;color:var(--pd-grey);margin-left:6px}
+    .pd .cb__close{width:34px;height:34px;display:flex;align-items:center;justify-content:center}
+    .pd .cb__close svg{width:18px;height:18px;fill:none;stroke:currentColor;stroke-width:1.4}
+    .pd .cb__close:hover{color:var(--pd-blue)}
+    .pd .cb__body{flex:1;overflow-y:auto;padding:0 18px;overscroll-behavior:contain}
+    .pd .cb__item{display:grid;grid-template-columns:92px 1fr auto;gap:14px;padding:16px 0;border-bottom:1px solid var(--pd-line)}
+    .pd .cb__img{display:block;width:92px;aspect-ratio:3/4;background:var(--pd-media);overflow:hidden}
+    .pd .cb__img img{width:100%;height:100%;object-fit:cover}
+    .pd .cb__img.is-pack img{mix-blend-mode:multiply}
+    .pd .cb__name{font-size:13px;font-weight:600;line-height:1.25}
+    .pd .cb__name:hover{color:var(--pd-blue)}
+    .pd .cb__meta{margin-top:4px;font-size:12px;line-height:1.45;color:var(--pd-grey)}
+    .pd .cb__qty{display:flex;align-items:center;gap:4px;margin-top:12px}
+    .pd .cb__qty button{width:26px;height:26px;display:flex;align-items:center;justify-content:center;font-size:16px;line-height:1}
+    .pd .cb__qty button:hover{color:var(--pd-blue)}
+    .pd .cb__qty span{min-width:18px;text-align:center;font-size:13px}
+    .pd .cb__side{display:flex;flex-direction:column;justify-content:space-between;align-items:flex-end;text-align:right}
+    .pd .cb__price{font-size:13px;font-weight:500;white-space:nowrap}
+    .pd .cb__remove{font-size:12px;color:var(--pd-grey);display:flex;align-items:center;gap:5px}
+    .pd .cb__remove svg{width:10px;height:10px;fill:none;stroke:currentColor;stroke-width:1.6}
+    .pd .cb__remove:hover{color:var(--pd-blue)}
+    .pd .cb__empty{display:none;padding:56px 0 40px;text-align:center;font-size:14px}
+    .pd .cb__empty a{display:inline-block;margin-top:14px;font-size:13px;color:var(--pd-grey);border-bottom:1px solid currentColor}
+    .pd .cb__empty a:hover{color:var(--pd-blue)}
+    .pd .cb.is-empty .cb__empty{display:block}
+    .pd .cb.is-empty .cb__foot{display:none}
+    .pd .cb__up{padding:22px 0 18px}
+    .pd .cb__up h3{font-size:12px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;margin-bottom:14px}
+    .pd .cb__uplist{display:flex;gap:10px;overflow-x:auto;scrollbar-width:none;padding-bottom:4px}
+    .pd .cb__uplist::-webkit-scrollbar{display:none}
+    .pd .cb__card{flex:0 0 128px}
+    .pd .cb__card .cb__img{width:128px}
+    .pd .cb__card p{margin-top:8px;font-size:12px;line-height:1.3}
+    .pd .cb__card p b{display:block;font-weight:600}
+    .pd .cb__card p span{color:var(--pd-grey)}
+    .pd .cb__acts{display:flex;gap:5px;margin-top:8px}
+    .pd .cb__acts button{flex:1;height:30px;border-radius:999px;background:#E8E9EB;font-size:12px;font-weight:500}
+    .pd .cb__acts button:hover{background:var(--pd-blue);color:#fff}
+    .pd .cb__foot{flex:none;padding:14px 18px 18px;border-top:1px solid var(--pd-line)}
+    .pd .cb__sum{display:flex;justify-content:space-between;font-size:14px;font-weight:600;margin-bottom:12px}
+    .pd .cb__checkout{width:100%;height:50px;border-radius:8px;background:#000;color:#fff;font-size:14px;font-weight:500}
+    .pd .cb__checkout:hover{background:var(--pd-blue)}
+    .pd .cb__note{margin-top:10px;text-align:center;font-size:11px;color:var(--pd-grey)}
+    .pd-bag span:empty,.pd-mob__count:empty{display:none}
+    .pd-mob__count{position:absolute;top:-4px;right:-6px;min-width:15px;height:15px;padding:0 3px;border-radius:999px;background:#000;color:#fff;
+      font-size:9px;line-height:15px;text-align:center}
+    .pd-mob a[data-bag]{position:relative}
+    .t706 .t706__cartwin{background:rgba(0,0,0,.35)!important;overflow:hidden!important}
+    .t706 .t706__cartwin-content{position:fixed!important;top:10px!important;right:10px!important;bottom:10px!important;left:auto!important;
+      width:min(460px,calc(100% - 20px))!important;max-width:none!important;margin:0!important;padding:0 0 18px!important;border-radius:12px!important;
+      overflow-y:auto!important;background:#fff!important;box-sizing:border-box}
+    .t706 .t706__cartwin-content,.t706 .t706__cartwin-content *{font-family:var(--pd-font,'Golos Text'),Arial,sans-serif!important}
+    .t706 .t706__cartwin-top{position:sticky;top:0;z-index:2;display:flex;align-items:center;height:48px;margin:0!important;padding:0 52px 0 18px!important;
+      border:0!important;background:#E8E9EB}
+    .t706 .t706__cartwin-heading{font-size:13px!important;font-weight:600!important;line-height:1!important;padding:0!important}
+    .t706 .t706__cartwin-back{display:flex;align-items:center;gap:6px;margin-right:14px;padding:0;border:0;background:none;cursor:pointer;
+      font-size:13px;color:#8C8C8C}
+    .t706 .t706__cartwin-back:hover{color:#1C00FF}
+    .t706 .t706__cartwin-back svg{width:12px;height:12px;fill:none;stroke:currentColor;stroke-width:1.6}
+    .t706 .t706__cartwin-close{position:fixed!important;top:17px!important;right:22px!important;left:auto!important;z-index:5;width:34px;height:34px;
+      padding:0!important;display:flex;align-items:center;justify-content:center;background:none!important;border-radius:0!important}
+    .t706 .t706__cartwin-close-icon{width:14px!important;height:14px!important}
+    .t706 .t706__cartwin-close-icon rect{fill:#000!important}
+    .t706 .t706__cartwin-close:hover .t706__cartwin-close-icon rect{fill:#1C00FF!important}
+    .t706 .t706__cartwin-products{display:block!important;width:auto!important;box-sizing:border-box!important;padding:6px 18px 0!important;margin:0!important}
+    .t706 .t706__product{display:flex!important;align-items:flex-start;gap:12px;width:auto!important;height:auto!important;box-sizing:border-box;padding:12px 0!important;border-top:0!important;border-bottom:1px solid #D9D9D9!important}
+    .t706 .t706__product-thumb{width:56px!important;min-width:56px;padding:0!important}
+    .t706 .t706__product-imgdiv{width:56px!important;height:74px!important;background-color:#F2F2F2!important;background-size:cover!important;border-radius:0!important}
+    .t706 .t706__product-title{flex:1;min-width:0;padding:0!important;font-size:13px!important;font-weight:600!important;line-height:1.3!important}
+    .t706 .t706__product-title a{color:#000!important}
+    .t706 .t706__product-title__option{margin-top:2px;font-size:12px!important;font-weight:400!important;color:#8C8C8C!important;opacity:1!important}
+    .t706 .t706__product-plusminus,.t706 .t706__product-del-wrapper{display:none!important}
+    .t706 .t706__product-amount{display:flex;gap:2px;padding:0!important;font-size:13px!important;font-weight:500!important;white-space:nowrap}
+    .t706 .t706__cartwin-bottom{padding:14px 18px 0!important;margin:0!important;border:0!important}
+    .t706 .t706__cartwin-prodamount-wrap{display:flex!important;justify-content:space-between;font-size:13px!important;color:#8C8C8C}
+    .t706 .t706__cartwin-prodamount-wrap *{font-weight:400!important}
+    .t706 .t706__orderform{padding:10px 18px 0!important;margin:0!important}
+    .t706 .t-input-group{margin-bottom:14px!important}
+    .t706 .t-input-title{padding-bottom:6px!important;font-size:12px!important;font-weight:400!important;color:#8C8C8C!important}
+    .t706 .t-input{height:46px!important;border:1px solid #D9D9D9!important;border-radius:0!important;background:#fff!important;box-shadow:none!important;
+      font-size:14px!important;color:#000!important}
+    .t706 .t-input:focus,.t706 .t-input-phonemask__wrap:focus-within{border-color:#000!important}
+    .t706 .t-input-phonemask__wrap{display:flex;align-items:center;padding-left:12px!important}
+    .t706 .t-input-phonemask__wrap .t-input{height:44px!important;border:0!important}
+    .t706 .t706__cartwin-totalamount-wrap{margin:18px 0 12px!important;padding:14px 0 0!important;border-top:1px solid #D9D9D9!important}
+    .t706 .t706__cartwin-totalamount-row{display:flex;justify-content:space-between}
+    .t706 .t706__cartwin-totalamount-row,.t706 .t706__cartwin-totalamount-row *{font-size:14px!important;font-weight:600!important}
+    .t706 .t-form__submit{padding:0!important;margin:0!important}
+    .t706 .t-submit{width:100%!important;height:50px!important;border:0!important;border-radius:8px!important;background:#000!important;color:#fff!important;
+      font-size:14px!important;font-weight:500!important}
+    .t706 .t-submit:hover{background:#1C00FF!important}
+    .t706 .t-form__errorbox-middle,.t706 .js-errorbox-all,.t706 .t-form__errorbox-wrapper{background:none!important}
+    .t706 .t-form__errorbox-wrapper{padding:0!important;margin:0 0 10px!important}
+    .t706 .t-form__errorbox-text,.t706 .t-form__errorbox-item{color:#e5484d!important;font-size:12px!important;text-align:left!important}
+    .t706 .t-input-error{color:#e5484d!important;font-size:11px!important}
+    .t706 .t-form__successbox{border-radius:0!important;background:#F2F2F2!important;color:#000!important;font-size:14px!important;text-align:left!important}
+    @media (max-width:820px){
+      .t706 .t706__cartwin-content{top:8px!important;right:8px!important;bottom:8px!important;width:calc(100% - 16px)!important}
+      .t706 .t706__cartwin-close{top:15px!important;right:18px!important}
+      .pd .cb__panel{top:8px;right:8px;bottom:8px;width:calc(100% - 16px)}
+      .pd .cb__item{grid-template-columns:80px 1fr auto}
+      .pd .cb__img{width:80px}
+    }
+  </style>
+  <div class="cb" role="dialog" aria-label="Bag">
+    <div class="cb__bg"></div>
+    <aside class="cb__panel">
+      <div class="cb__head">
+        <span class="cb__title">bag<i class="cb__count"></i></span>
+        <button class="cb__close" type="button" aria-label="Close"><svg viewBox="0 0 24 24"><path d="M6 6l12 12M18 6L6 18"/></svg></button>
+      </div>
+      <div class="cb__body">
+        <div class="cb__items"></div>
+        <div class="cb__empty">your bag is empty<br><a href="/shop">continue shopping</a></div>
+        <section class="cb__up"><h3>complete the fit</h3><div class="cb__uplist"></div></section>
+      </div>
+      <div class="cb__foot">
+        <div class="cb__sum"><span>subtotal</span><span class="cb__total"></span></div>
+        <button class="cb__checkout" type="button">checkout</button>
+        <p class="cb__note">shipping and payment on the next step</p>
+      </div>
+    </aside>
+  </div>
+  <script>
+  (function () {
+    var C = {"recid": "1165615896", "current": null, "catalog": [{"lid": "1790151422344", "name": "Realtree Balloons", "cname": "Realtree Baloons", "color": "Light Khaki Camo", "price": 14700, "img": "https://strklvskyy11.github.io/exmptmind-content/products/w/realtree-balloons-pack-front-480.webp", "pack": true, "sizes": ["One Size"], "url": "/shop/realtree-balloons", "sku": "realtree_balloons"}, {"lid": "8188546817190", "name": "OG Cargo Pants", "cname": "OG Cargo Pants", "color": "Hiker Moss", "price": 12900, "img": "https://strklvskyy11.github.io/exmptmind-content/products/w/og-cargo-pants-hiker-moss-01-13-480.webp", "pack": false, "sizes": ["M", "L"], "url": "/shop/og-cargo-pants-hiker-moss", "sku": "og_cargo_pants_hiker_moss"}, {"lid": "1753015816827", "name": "OG Cargo Pants", "cname": "OG Cargo Pants", "color": "Utility Black", "price": 12900, "img": "https://strklvskyy11.github.io/exmptmind-content/products/w/og-cargo-pants-utility-black-01-32-480.webp", "pack": false, "sizes": ["M", "L"], "url": "/shop/og-cargo-pants-utility-black", "sku": "og_cargo_pants_utility_black"}, {"lid": "8198546817191", "name": "Crop Jersey Tee", "cname": "Crop Jersey T-Shirt", "color": "Black", "price": 4900, "img": "https://strklvskyy11.github.io/exmptmind-content/products/w/crop-jersey-tee-black-01-IMG_5872-480.webp", "pack": false, "sizes": ["One Size"], "url": "/shop/crop-jersey-tee-black", "sku": "crop_jersey_tee_black"}, {"lid": "1753216551793", "name": "Crop Jersey Tee", "cname": "Crop Jersey T-Shirt", "color": "White", "price": 4900, "img": "https://strklvskyy11.github.io/exmptmind-content/products/w/crop-jersey-tee-white-01-IMG_5864-480.webp", "pack": false, "sizes": ["One Size"], "url": "/shop/crop-jersey-tee-white", "sku": "crop_jersey_tee_white"}], "store": {"part": "528022169013", "rec": "6048654301"}, "t": {"remove": "remove", "add": "add", "option": "Size", "checkout": "checkout", "soldout": "sold out", "back": "bag", "subtotal": "subtotal", "total": "total"}};
+    var root = document.querySelector('.cb'); if (!root) return;
+    var X = '<svg viewBox="0 0 24 24"><path d="M6 6l12 12M18 6L6 18"/></svg>';
+    function ready() { return !!(window.tcart && typeof window.tcart__addProduct === 'function'); }
+    function list() {
+      if (window.tcart && window.tcart.products) return window.tcart.products;
+      try { return (JSON.parse(localStorage.getItem('tcart')) || {}).products || []; } catch (e) { return []; }
+    }
+    function alive(p) { return p && p.deleted !== 'yes' && parseInt(p.quantity, 10) > 0; }
+    function money(n) { return String(Math.round(n)).replace(/\B(?=(\d{3})+(?!\d))/g, '\u00a0') + '\u00a0\u20bd'; }
+    function esc(s) { return String(s == null ? '' : s).replace(/[&<>"]/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]; }); }
+    function count() { return list().filter(alive).reduce(function (n, p) { return n + parseInt(p.quantity, 10); }, 0); }
+    function total() { return list().filter(alive).reduce(function (s, p) { return s + (parseFloat(p.amount) || p.price * p.quantity); }, 0); }
+    function info(lid) { for (var i = 0; i < C.catalog.length; i++) if (C.catalog[i].lid === String(lid)) return C.catalog[i]; return null; }
+    function key(p) { return p.pk || p.lid; }
+    var S = null;
+    function edition(c, size) {
+      var e = S && S[c.sku]; if (!e) return null;
+      return e.ed[size] || e.ed[''] || (c.sizes.length === 1 ? e.ed[Object.keys(e.ed)[0]] : null);
+    }
+    function soldOut(c, size) { var e = edition(c, size); return !!(e && e.inv === 0); }
+    function allSold(c) { return !!(S && S[c.sku]) && c.sizes.every(function (z) { return soldOut(c, z); }); }
+    function applyStock() {
+      if (!S) return;
+      C.catalog.forEach(function (c) {
+        var e = S[c.sku]; if (!e) return;
+        if (e.price) c.price = e.price;
+        document.querySelectorAll('[data-p="' + c.sku + '"]').forEach(function (el) {
+          el.textContent = allSold(c) ? C.t.soldout : money(c.price);
+        });
+      });
+      var c = info(C.current); if (!c) return;
+      document.querySelectorAll('.pd-sizes .pd-size, .pd-lb__size').forEach(function (b) {
+        var off = soldOut(c, b.textContent.trim());
+        b.classList.toggle('is-sold', off); b.disabled = off;
+        if (off) b.classList.remove('is-active');
+      });
+      if (allSold(c)) {
+        var info_ = document.querySelector('.pd-info'); if (info_) info_.classList.add('is-soldout');
+        document.querySelectorAll('[data-cart]').forEach(function (b) { b.classList.add('is-sold'); });
+        document.querySelectorAll('.pd-btn[data-cart="add"], .pd-lb__btn[data-cart="add"], .pd-mbar__cta').forEach(function (b) { b.textContent = C.t.soldout; });
+      }
+    }
+    function loadStock() {
+      try { var k = JSON.parse(sessionStorage.getItem('pdStock') || 'null'); if (k && Date.now() - k.t < 60000) { S = k.s; applyStock(); return; } } catch (e) {}
+      fetch('https://store.tildaapi.com/api/getproductslist/?storepartuid=' + C.store.part + '&recid=' + C.store.rec + '&getoptions=true&slice=1&size=100')
+        .then(function (r) { return r.json(); })
+        .then(function (d) {
+          var m = {};
+          (d.products || []).forEach(function (p) {
+            var eds = p.editions && p.editions.length ? p.editions : [p], base = '';
+            eds.forEach(function (e) {
+              var sk = String(e.sku || p.sku || ''), fx = sk.match(/_(xs|s|m|l|xl|xxl)$/i);
+              var z = e['\u0420\u0430\u0437\u043c\u0435\u0440'] || (eds.length > 1 && fx ? fx[1].toUpperCase() : '');
+              if (!base) base = String(p.sku || '') || sk.replace(/_(xs|s|m|l|xl|xxl|one_size)$/i, '');
+              (m[base] = m[base] || { price: parseFloat(String(p.price).replace(/\s/g, '')) || 0, ed: {} }).ed[z] =
+                { uid: String(e.uid), sku: sk, price: parseFloat(String(e.price).replace(/\s/g, '')) || 0, inv: e.quantity === '' || e.quantity == null ? null : parseInt(e.quantity, 10) };
+            });
+          });
+          S = m; try { sessionStorage.setItem('pdStock', JSON.stringify({ t: Date.now(), s: m })); } catch (e) {}
+          applyStock();
+        }).catch(function () {});
+    }
+    function commit() {
+      try { tcart__updateTotalProductsinCartObj(); tcart__saveLocalObj(); } catch (e) {}
+      try { window.tcart__reDrawCartIcon && tcart__reDrawCartIcon(); window.tcart__reDrawProducts && tcart__reDrawProducts(); } catch (e) {}
+    }
+    function badge() {
+      var n = count();
+      document.querySelectorAll('[data-bag-count]').forEach(function (el) {
+        el.textContent = n ? (el.getAttribute('data-bag-count') === 'dash' ? ' \u2014 ' + n : n) : '';
+      });
+    }
+    function render() {
+      var items = list(), html = '', inCart = {};
+      items.forEach(function (p, i) {
+        if (!alive(p)) return;
+        inCart[key(p)] = 1;
+        var c = info(key(p)), size = '';
+        (p.options || []).forEach(function (o) { if (o && o.variant) size = o.variant; });
+        var url = c ? c.url : (p.url || '#');
+        html += '<div class="cb__item" data-i="' + i + '">' +
+          '<a class="cb__img' + (c && c.pack ? ' is-pack' : '') + '" href="' + esc(url) + '"><img src="' + esc(p.img || (c && c.img) || '') + '" alt=""></a>' +
+          '<div><a class="cb__name" href="' + esc(url) + '">' + esc(c ? c.name : p.name) + '</a>' +
+          '<div class="cb__meta">' + esc(c ? c.color : (p.sku || '')) + (size ? '<br>' + esc(size) : '') + '</div>' +
+          '<div class="cb__qty"><button type="button" data-q="-1" aria-label="-">\u2212</button><span>' + p.quantity + '</span><button type="button" data-q="1" aria-label="+">+</button></div></div>' +
+          '<div class="cb__side"><span class="cb__price">' + money(parseFloat(p.amount) || p.price * p.quantity) + '</span>' +
+          '<button class="cb__remove" type="button" data-q="0">' + X + C.t.remove + '</button></div></div>';
+      });
+      root.querySelector('.cb__items').innerHTML = html;
+      var up = '';
+      C.catalog.forEach(function (c) {
+        if (inCart[c.lid] || c.lid === C.current) return;
+        if (allSold(c)) return;
+        var acts = c.sizes.filter(function (s) { return !soldOut(c, s); }).map(function (s) {
+          return '<button type="button" data-add="' + c.lid + '" data-size="' + esc(s) + '">' + esc(c.sizes.length > 1 ? s : C.t.add) + '</button>';
+        }).join('');
+        up += '<div class="cb__card"><a class="cb__img' + (c.pack ? ' is-pack' : '') + '" href="' + c.url + '"><img src="' + c.img + '" alt="" loading="lazy"></a>' +
+          '<p><b>' + esc(c.name) + '</b><span>' + esc(c.color) + '</span><br>' + money(c.price) + '</p><div class="cb__acts">' + acts + '</div></div>';
+      });
+      root.querySelector('.cb__uplist').innerHTML = up;
+      root.querySelector('.cb__up').style.display = up ? '' : 'none';
+      var n = count();
+      root.querySelector('.cb__count').textContent = n ? '(' + n + ')' : '';
+      root.querySelector('.cb__total').textContent = money(total());
+      root.classList.toggle('is-empty', !n);
+      badge();
+    }
+    function open() {
+      if (window.tcart__syncProductsObject__LStoObj) try { tcart__syncProductsObject__LStoObj(); } catch (e) {}
+      render(); root.classList.add('is-open'); document.documentElement.style.overflow = 'hidden';
+    }
+    function close() { root.classList.remove('is-open'); document.documentElement.style.overflow = ''; }
+    function add(lid, size) {
+      var c = info(lid); if (!c || !ready()) return false;
+      size = size || c.sizes[0];
+      var ed = edition(c, size); if (ed && ed.inv === 0) return false;
+      var el = document.querySelector('.t706'), was = el && el.getAttribute('data-opencart-onorder'), bubble = window.tcart__showBubble;
+      if (el) el.setAttribute('data-opencart-onorder', 'no');
+      window.tcart__showBubble = function () {};
+      try {
+        var item = { name: c.cname || c.name, price: (ed && ed.price) || c.price, img: c.img, recid: C.recid, pk: c.lid, sku: ed ? ed.sku : c.color,
+          options: [{ option: C.t.option, variant: size }], url: location.origin + c.url };
+        if (ed) { item.uid = ed.uid; item.gen_uid = ed.uid; item.lid = ed.uid; if (ed.inv != null) item.inv = ed.inv; }
+        else item.lid = c.lid;
+        tcart__addProduct(item);
+      } finally {
+        window.tcart__showBubble = bubble;
+        if (el && was !== null) el.setAttribute('data-opencart-onorder', was);
+      }
+      return true;
+    }
+    function checkout() {
+      close(); tcart__openCart();
+      var win = document.querySelector('.t706__cartwin'); if (!win) return;
+      var h = win.querySelector('.t706__cartwin-heading'); if (h) h.textContent = C.t.checkout;
+      var top = win.querySelector('.t706__cartwin-top');
+      if (top && !top.querySelector('.t706__cartwin-back')) {
+        var b = document.createElement('button'); b.type = 'button'; b.className = 't706__cartwin-back';
+        b.innerHTML = '<svg viewBox="0 0 12 12"><path d="M8 1L3 6l5 5"/></svg>' + C.t.back;
+        b.addEventListener('click', function () { tcart__closeCart(); setTimeout(open, 50); });
+        top.insertBefore(b, top.firstChild);
+      }
+      function labels() {
+        var a = win.querySelector('.t706__cartwin-prodamount-label'); if (a) a.textContent = C.t.subtotal;
+        var t = win.querySelector('.t706__cartwin-totalamount-row_total .t706__cartwin-totalamount-label, .t706__cartwin-totalamount-row_total > div:first-child');
+        if (t && !t.querySelector('*')) t.textContent = C.t.total;
+      }
+      labels(); setTimeout(labels, 400);
+    }
+    function chosenSize(btn) {
+      var lb = btn.closest('.pd-lb'), a = (lb || document).querySelector(lb ? '.pd-lb__size.is-active' : '.pd-sizes .pd-size.is-active');
+      return a ? a.textContent.trim() : '';
+    }
+    document.addEventListener('click', function (e) {
+      var bag = e.target.closest('[data-bag]');
+      if (bag) { e.preventDefault(); open(); return; }
+      var btn = e.target.closest('[data-cart]');
+      if (btn) {
+        if (!ready()) return;
+        var info_ = document.querySelector('.pd-info');
+        if (info_ && info_.classList.contains('needs-size')) return;
+        e.preventDefault();
+        if (!add(C.current, chosenSize(btn))) return;
+        var lbClose = document.querySelector('.pd-lb.is-open .pd-lb__close'); if (lbClose) lbClose.click();
+        if (btn.getAttribute('data-cart') === 'buy') { commit(); checkout(); } else { commit(); open(); }
+        return;
+      }
+      if (!root.contains(e.target)) return;
+      var row = e.target.closest('.cb__item'), q = e.target.closest('[data-q]');
+      if (row && q) {
+        var p = window.tcart.products[+row.getAttribute('data-i')], d = +q.getAttribute('data-q');
+        if (!p) return;
+        if (d === 0 || p.quantity + d <= 0) window.tcart.products.splice(+row.getAttribute('data-i'), 1);
+        else if (!(d > 0 && p.inv > 0 && p.quantity >= p.inv)) { p.quantity += d; p.amount = Math.round(p.price * p.quantity * 100) / 100; }
+        commit(); render(); return;
+      }
+      var u = e.target.closest('[data-add]');
+      if (u) { if (add(u.getAttribute('data-add'), u.getAttribute('data-size'))) { commit(); render(); } return; }
+      if (e.target.closest('.cb__close') || e.target.classList.contains('cb__bg')) { close(); return; }
+      if (e.target.closest('.cb__checkout')) { checkout(); }
+    });
+    document.addEventListener('keydown', function (e) { if (e.key === 'Escape' && root.classList.contains('is-open')) close(); });
+    loadStock();
+    badge(); var tries = 0, t = setInterval(function () { badge(); if (ready() || ++tries > 20) clearInterval(t); }, 300);
+  })();
+  </script>
+<script>
+(function () {
+  document.addEventListener('error', function (e) {
+    var i = e.target; if (!i || i.tagName !== 'IMG' || i.getAttribute('data-retry') || !/github\.io|jsdelivr/.test(i.currentSrc || i.src)) return;
+    i.setAttribute('data-retry', '1');
+    setTimeout(function () { if (i.srcset) i.srcset = i.srcset.replace(/\.webp(?=[ ,]|$)/g, '.webp?r=1'); i.src = i.src + '?r=1'; }, 800);
+  }, true);
+})();
+(function () {
+  var c = navigator.connection; if (c && (c.saveData || /2g/.test(c.effectiveType || ''))) return;
+  function go() {
+    var list = [].filter.call(document.querySelectorAll('.pd img[loading="lazy"]'), function (i) { return i.getClientRects().length && !i.closest('.pd-lb'); }), k = 0;
+    (function next() { for (var n = 0; n < 3 && k < list.length; n++, k++) list[k].loading = 'eager'; if (k < list.length) setTimeout(next, 150); })();
+  }
+  function start() { setTimeout(go, 300); }
+  if (document.readyState === 'complete') start(); else addEventListener('load', start);
+})();
+</script>
+</div>
+<script>
+(function () {
+  var items = document.querySelectorAll('.pd-announce span'); if (items.length < 2) return;
+  var i = 0;
+  setInterval(function () {
+    items[i].classList.remove('is-on'); i = (i + 1) % items.length; items[i].classList.add('is-on');
+  }, 4000);
+})();
+(function () {
+  var h = document.querySelector('.pd-header'), b = document.querySelector('.pd-burger');
+  if (!h || !b) return;
+  b.addEventListener('click', function () { h.classList.toggle('is-menu'); });
+})();
+(function () {
+  var hero = document.querySelector('.hm-hero'), sheet = document.querySelector('.hm-sheet'); if (!hero) return;
+  var mq = window.matchMedia('(max-width:820px)'), still = window.matchMedia('(prefers-reduced-motion: reduce)').matches, sets = {}, s;
+  function load(img, first) {
+    if (img.getAttribute('srcset')) return;
+    if (first) img.setAttribute('fetchpriority', 'high');
+    img.sizes = img.getAttribute('data-sizes'); img.srcset = img.getAttribute('data-srcset');
+  }
+  function afterLoad(fn) { if (document.readyState === 'complete') setTimeout(fn, 300); else addEventListener('load', function () { setTimeout(fn, 300); }); }
+  function setup() {
+    var kind = mq.matches ? 'm' : 'd';
+    if (sets[kind]) return sets[kind];
+    var imgs = [].slice.call(hero.querySelectorAll('.hm-slides--' + kind + ' .hm-slide'));
+    if (!imgs.length) return null;
+    var k = Math.floor(Math.random() * imgs.length);
+    imgs[k].classList.add('is-on'); load(imgs[k], true);
+    if (!still) afterLoad(function () { imgs.forEach(function (im) { load(im); }); });
+    return (sets[kind] = { imgs: imgs, k: k });
+  }
+  s = setup();
+  if (mq.addEventListener) mq.addEventListener('change', function () { s = setup(); });
+  if (still) return;
+  var busy = false;
+  setInterval(function () {
+    if (!s || busy || document.hidden || (sheet && sheet.getBoundingClientRect().top <= 0)) return;
+    var ready = [];
+    s.imgs.forEach(function (im, i) { if (i !== s.k && im.complete && im.naturalWidth) ready.push(i); });
+    if (!ready.length) return;
+    var a = s.imgs[s.k], n = ready[Math.floor(Math.random() * ready.length)], b = s.imgs[n];
+    busy = true;
+    var go = function () {
+      s.k = n; b.classList.add('is-top'); void b.offsetWidth; b.classList.add('is-on');
+      setTimeout(function () { a.classList.remove('is-on'); b.classList.remove('is-top'); busy = false; }, 1500);
+    };
+    if (b.decode) b.decode().then(go, go); else go();
+  }, 5000);
+})();
+(function () {
+  var hero = document.querySelector('.hm-hero'), sheet = document.querySelector('.hm-sheet'); if (!hero || !sheet) return;
+  var shade = hero.querySelector('.hm-hero__shade'), txt = hero.querySelector('.hm-hero__in'), ticking = false;
+  var head = document.querySelector('.pd-header'), pill = head && head.querySelector('.pd-pill'), clear = null;
+  function update() {
+    ticking = false;
+    var top = sheet.getBoundingClientRect().top;
+    var c = !!pill && top <= head.offsetTop + pill.offsetTop;
+    if (c !== clear) { clear = c; if (head) head.classList.toggle('is-clear', c); }
+    var p = Math.min(1, Math.max(0, 1 - top / (hero.offsetHeight || 1)));
+    shade.style.opacity = (p * .45).toFixed(3);
+    txt.style.transform = 'translateY(' + (-p * 70) + 'px)';
+    txt.style.opacity = Math.max(0, 1 - p * 1.6).toFixed(3);
+  }
+  addEventListener('scroll', function () { if (!ticking) { ticking = true; requestAnimationFrame(update); } }, { passive: true });
+  addEventListener('resize', update); update();
+})();
+(function () {
+  var sec = document.querySelector('.hm-pano'); if (!sec) return;
+  var m = sec.querySelector('.hm-pano__media'), ticking = false;
+  if (window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+  function update() {
+    ticking = false;
+    var r = sec.getBoundingClientRect(), vh = innerHeight;
+    if (r.bottom < 0 || r.top > vh) return;
+    var p = (r.top + r.height / 2 - vh / 2) / (vh + r.height);
+    m.style.transform = 'translateY(' + (p * 14).toFixed(2) + '%)';
+  }
+  addEventListener('scroll', function () { if (!ticking) { ticking = true; requestAnimationFrame(update); } }, { passive: true });
+  addEventListener('resize', update); update();
+})();
+(function () {
+  var els = document.querySelectorAll('.hm-rv, .hm-story');
+  if (!('IntersectionObserver' in window)) { els.forEach(function (e) { e.classList.add('is-in'); }); return; }
+  var io = new IntersectionObserver(function (es) {
+    es.forEach(function (e) { if (e.isIntersecting) { e.target.classList.add('is-in'); io.unobserve(e.target); } });
+  }, { threshold: .12, rootMargin: '0px 0px -6% 0px' });
+  els.forEach(function (e) { io.observe(e); });
+})();
+</script>
